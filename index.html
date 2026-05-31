@@ -472,7 +472,7 @@ async function doConnect(){
   const path   = document.getElementById('cfg-pa').value.trim()||'menu.json';
   if(!token||!owner||!repo){ notify('请填写 Token、用户名、仓库名','err'); return; }
   S.cfg = { token, owner, repo, branch, path };
-  localStorage.setItem('menu_cfg', JSON.stringify({ owner, repo, branch, path }));
+  localStorage.setItem('menu_cfg', JSON.stringify({ token, owner, repo, branch, path }));
   try {
     notify('连接中…','');
     await ghLoad();
@@ -908,14 +908,22 @@ function notify(msg,type=''){
 // ═══════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════
-// Restore non-sensitive config
-try {
-  const c=JSON.parse(localStorage.getItem('menu_cfg')||'{}');
-  if(c.owner) document.getElementById('cfg-own').value=c.owner;
-  if(c.repo)  document.getElementById('cfg-rep').value=c.repo;
-  if(c.branch)document.getElementById('cfg-br').value=c.branch;
-  if(c.path)  document.getElementById('cfg-pa').value=c.path;
-} catch(e){}
+// Restore config & auto-reconnect on refresh
+(async()=>{
+  try {
+    const c=JSON.parse(localStorage.getItem('menu_cfg')||'{}');
+    if(c.token) document.getElementById('cfg-tok').value=c.token;
+    if(c.owner) document.getElementById('cfg-own').value=c.owner;
+    if(c.repo)  document.getElementById('cfg-rep').value=c.repo;
+    if(c.branch)document.getElementById('cfg-br').value=c.branch;
+    if(c.path)  document.getElementById('cfg-pa').value=c.path;
+    if(c.token&&c.owner&&c.repo){
+      S.cfg={ token:c.token, owner:c.owner, repo:c.repo, branch:c.branch||'main', path:c.path||'menu.json' };
+      try { await ghLoad(); } catch(e){ if(e.message.startsWith('404')){ S.data=mkData(); S.sha=null; } else { throw e; } }
+      showApp();
+    }
+  } catch(e){ console.warn('Auto-connect failed:',e); }
+})();
 
 // Close dropdowns on outside click
 document.addEventListener('click',e=>{
