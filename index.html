@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>菜单数据库</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Noto+Serif+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:         #0C0A08;
+  --surface:    #141210;
+  --card:       #1C1714;
+  --card-h:     #231E18;
+  --border:     #2A231C;
+  --border-l:   #382E24;
+  --text:       #EDE8DF;
+  --text-d:     #8A7F70;
+  --text-dd:    #453C32;
+  --gold:       #C9963A;
+  --gold-l:     #DFB05A;
+
+  --ext:    #6B8FA8;
+  --mas:    #5E8F6E;
+  --idea:   #C9963A;
+  --suc:    #4E8F74;
+  --fail:   #A86B5E;
+
+  --rec:   #C4785A;
+  --coc:   #7A8EC4;
+  --bak:   #C4A45A;
+  --ing:   #5AC47A;
+  --spi:   #A45AC4;
+}
+
+html, body { height: 100%; overflow: hidden; }
+body { font-family: 'Noto Serif SC', serif; background: var(--bg); color: var(--text); }
+
+/* ── Settings ── */
+.screen-settings {
+  display: flex; align-items: center; justify-content: center;
+  height: 100vh;
+  background: radial-gradient(ellipse at 40% 30%, #1E1610 0%, #0C0A08 65%);
+}
+.cfg-card {
+  background: var(--card); border: 1px solid var(--border-l);
+  border-radius: 3px; padding: 2.5rem 2.75rem; width: 100%; max-width: 460px;
+}
+.cfg-logo {
+  font-family: 'Cormorant Garamond', serif; font-size: 2.2rem;
+  font-weight: 300; letter-spacing: .18em; color: var(--gold);
+  text-align: center; margin-bottom: .25rem;
+}
+.cfg-sub {
+  text-align: center; color: var(--text-d); font-size: .8rem;
+  letter-spacing: .08em; margin-bottom: 2rem;
+}
+.frow { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+.fg { margin-bottom: 1rem; }
+.fl {
+  display: block; font-size: .68rem; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--text-d); margin-bottom: .4rem;
+}
+.fi, .fs, .fta {
+  width: 100%; background: var(--surface); border: 1px solid var(--border-l);
+  border-radius: 2px; padding: .65rem .9rem; color: var(--text);
+  font-family: 'Noto Serif SC', serif; font-size: .88rem; outline: none;
+  transition: border-color .2s;
+}
+.fi:focus, .fs:focus, .fta:focus { border-color: var(--gold); }
+.fhint { font-size: .7rem; color: var(--text-dd); margin-top: .3rem; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: .4rem; padding: .65rem 1.25rem; border: none; border-radius: 2px;
+  cursor: pointer; font-family: 'Noto Serif SC', serif;
+  font-size: .85rem; letter-spacing: .06em; transition: all .18s;
+}
+.btn-gold { background: var(--gold); color: #0C0A08; width: 100%; margin-top: .25rem; }
+.btn-gold:hover { background: var(--gold-l); }
+.btn-ghost {
+  background: transparent; color: var(--text-d);
+  border: 1px solid var(--border-l);
+}
+.btn-ghost:hover { color: var(--text); border-color: var(--text-d); }
+.btn-w { width: 100%; margin-top: .4rem; }
+.btn-sm { padding: .4rem .75rem; font-size: .78rem; }
+.btn-danger { background: transparent; color: var(--fail); border: 1px solid var(--fail); }
+.btn-danger:hover { background: var(--fail); color: var(--text); }
+
+/* ── App layout ── */
+.app {
+  display: grid;
+  grid-template-columns: 196px 1fr;
+  grid-template-rows: 52px 1fr;
+  height: 100vh; display: none;
+}
+
+/* Header */
+.hdr {
+  grid-column: 1 / -1; background: var(--surface);
+  border-bottom: 1px solid var(--border); display: flex;
+  align-items: center; padding: 0 1.25rem; gap: 1rem;
+}
+.hdr-logo {
+  font-family: 'Cormorant Garamond', serif; font-size: 1.15rem;
+  font-weight: 300; color: var(--gold); letter-spacing: .2em; white-space: nowrap;
+}
+.hdr-sep { width: 1px; height: 20px; background: var(--border-l); }
+.hdr-search {
+  flex: 1; max-width: 360px; background: var(--card);
+  border: 1px solid var(--border); border-radius: 2px;
+  padding: .38rem .8rem; color: var(--text);
+  font-family: 'Noto Serif SC', serif; font-size: .83rem; outline: none;
+}
+.hdr-search:focus { border-color: var(--gold); }
+.hdr-search::placeholder { color: var(--text-dd); }
+.hdr-right { margin-left: auto; display: flex; align-items: center; gap: .75rem; }
+.save-st { font-size: .72rem; }
+
+/* Sidebar */
+.sidebar {
+  background: var(--surface); border-right: 1px solid var(--border);
+  padding: .75rem 0; overflow-y: auto;
+}
+.nav-sec-lbl {
+  font-size: .62rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--text-dd); padding: .5rem 1.1rem .3rem;
+}
+.nav-item {
+  display: flex; align-items: center; gap: .65rem;
+  padding: .58rem 1.1rem; cursor: pointer;
+  border-left: 2px solid transparent; color: var(--text-d);
+  font-size: .88rem; transition: all .14s;
+}
+.nav-item:hover { color: var(--text); background: var(--card); }
+.nav-item.active { color: var(--gold); border-left-color: var(--gold); background: rgba(201,150,58,.07); }
+.nav-ico { font-size: .95rem; width: 1.1rem; text-align: center; }
+.nav-ct {
+  margin-left: auto; font-size: .68rem; color: var(--text-dd);
+  background: var(--card); padding: .1rem .4rem; border-radius: 20px;
+}
+
+/* Main content */
+.content { overflow-y: auto; padding: 1.5rem; }
+
+/* Content header */
+.ch { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+.ch-left { display: flex; align-items: baseline; gap: .6rem; }
+.ch-title { font-family: 'Cormorant Garamond', serif; font-size: 1.7rem; font-weight: 300; }
+.ch-count { font-size: .78rem; color: var(--text-dd); }
+
+/* Zone tabs */
+.ztabs { display: flex; gap: .4rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+.ztab {
+  padding: .32rem .85rem; border-radius: 1px; font-size: .74rem;
+  letter-spacing: .07em; cursor: pointer; border: 1px solid var(--border-l);
+  color: var(--text-d); background: transparent; transition: all .14s;
+  font-family: 'Noto Serif SC', serif;
+}
+.ztab:hover { color: var(--text); }
+.ztab.active { color: #0C0A08; border-color: transparent; }
+
+/* Filter chips */
+.flt-row { display: flex; gap: .4rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+.flt-btn {
+  padding: .28rem .7rem; font-size: .74rem; background: transparent;
+  border: 1px solid var(--border-l); border-radius: 1px; color: var(--text-d);
+  cursor: pointer; font-family: 'Noto Serif SC', serif; transition: all .14s;
+}
+.flt-btn:hover { color: var(--text); }
+.flt-btn.active { background: var(--gold); color: #0C0A08; border-color: var(--gold); }
+
+/* Cards */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: .9rem; }
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 2px; padding: 1.1rem; cursor: pointer;
+  transition: all .18s; position: relative; overflow: hidden;
+}
+.card:hover { background: var(--card-h); border-color: var(--border-l); transform: translateY(-1px); }
+.card-bar { position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+.card-zone {
+  font-size: .62rem; letter-spacing: .1em; text-transform: uppercase;
+  padding: .18rem .55rem; border-radius: 20px; display: inline-block; margin-bottom: .65rem;
+}
+.card-name { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 400; margin-bottom: .3rem; line-height: 1.3; }
+.card-desc { font-size: .78rem; color: var(--text-d); line-height: 1.55; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card-tags { display: flex; gap: .35rem; margin-top: .6rem; flex-wrap: wrap; }
+.card-tag { font-size: .62rem; padding: .12rem .45rem; background: var(--border); border-radius: 20px; color: var(--text-d); }
+.card-foot { display: flex; gap: .5rem; margin-top: .5rem; font-size: .7rem; color: var(--text-dd); }
+.card-src { font-size: .68rem; color: var(--text-dd); margin-top: .3rem; font-style: italic; }
+
+/* Empty */
+.empty { text-align: center; padding: 4rem 2rem; color: var(--text-dd); }
+.empty-ico { font-size: 2.5rem; margin-bottom: .75rem; }
+.empty-txt { font-size: .85rem; }
+
+/* ── Modal ── */
+.modal-bg {
+  position: fixed; inset: 0; background: rgba(0,0,0,.8);
+  display: none; align-items: center; justify-content: center; z-index: 100; padding: 1.5rem;
+}
+.modal-bg.open { display: flex; }
+.modal {
+  background: var(--card); border: 1px solid var(--border-l);
+  border-radius: 3px; width: 100%; max-width: 580px;
+  max-height: 88vh; overflow-y: auto; padding: 1.75rem;
+}
+.modal-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+.modal-title { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 400; color: var(--gold); }
+.modal-x { background: none; border: none; color: var(--text-d); cursor: pointer; font-size: 1.1rem; padding: .25rem; }
+.modal-ftr { display: flex; justify-content: flex-end; gap: .6rem; margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid var(--border); }
+
+/* Form */
+.fta { resize: vertical; min-height: 72px; }
+.frow2 { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+
+/* Chips */
+.chips-box {
+  display: flex; flex-wrap: wrap; gap: .35rem; align-items: center;
+  padding: .45rem; background: var(--surface); border: 1px solid var(--border-l);
+  border-radius: 2px; min-height: 44px; cursor: text;
+}
+.chips-box:focus-within { border-color: var(--gold); }
+.chip {
+  display: inline-flex; align-items: center; gap: .25rem;
+  padding: .18rem .55rem; background: var(--border-l); border-radius: 20px;
+  font-size: .76rem; color: var(--text);
+}
+.chip-x { cursor: pointer; color: var(--text-d); line-height: 1; font-size: .85rem; }
+.chip-x:hover { color: var(--fail); }
+.tags-inp { background: none; border: none; outline: none; color: var(--text); font-family: 'Noto Serif SC', serif; font-size: .84rem; min-width: 70px; flex: 1; }
+
+/* Assoc dropdown */
+.rel { position: relative; }
+.assoc-dd {
+  position: absolute; z-index: 20; top: 100%; left: 0; right: 0;
+  background: var(--card-h); border: 1px solid var(--border-l);
+  border-radius: 2px; max-height: 180px; overflow-y: auto;
+  box-shadow: 0 6px 24px rgba(0,0,0,.6); display: none;
+}
+.assoc-opt { padding: .55rem .9rem; cursor: pointer; font-size: .83rem; color: var(--text-d); transition: all .1s; }
+.assoc-opt:hover { background: var(--card); color: var(--text); }
+
+/* Steps */
+.step-row { display: flex; gap: .5rem; margin-bottom: .45rem; align-items: center; }
+.step-num { color: var(--gold); font-family: 'Cormorant Garamond', serif; width: 1.1rem; text-align: center; flex-shrink: 0; }
+
+/* ── Detail Panel ── */
+.detail {
+  position: fixed; right: 0; top: 52px; bottom: 0; width: 400px;
+  background: var(--surface); border-left: 1px solid var(--border);
+  transform: translateX(100%); transition: transform .28s ease;
+  z-index: 50; overflow-y: auto; padding: 1.5rem;
+}
+.detail.open { transform: translateX(0); }
+.detail-x { position: absolute; top: .9rem; right: .9rem; background: none; border: none; color: var(--text-d); cursor: pointer; font-size: 1.1rem; }
+.d-name { font-family: 'Cormorant Garamond', serif; font-size: 1.85rem; font-weight: 300; line-height: 1.2; margin: .75rem 0 .5rem; }
+.d-src { font-size: .78rem; color: var(--text-d); font-style: italic; margin-bottom: .75rem; }
+.d-sec { margin-top: 1.1rem; padding-top: 1.1rem; border-top: 1px solid var(--border); }
+.d-sec-lbl { font-size: .62rem; letter-spacing: .15em; text-transform: uppercase; color: var(--text-dd); margin-bottom: .6rem; }
+.d-text { font-size: .86rem; color: var(--text-d); line-height: 1.7; }
+.steps-ol { list-style: none; counter-reset: s; }
+.steps-ol li { counter-increment: s; display: flex; gap: .65rem; margin-bottom: .65rem; font-size: .85rem; color: var(--text-d); line-height: 1.6; }
+.steps-ol li::before {
+  content: counter(s); background: var(--card); color: var(--gold);
+  min-width: 1.4rem; height: 1.4rem; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .72rem; font-family: 'Cormorant Garamond', serif; flex-shrink: 0; margin-top: .1rem;
+}
+.linked-chips { display: flex; flex-wrap: wrap; gap: .35rem; }
+.linked-chip {
+  padding: .22rem .6rem; background: var(--card); border: 1px solid var(--border-l);
+  border-radius: 20px; font-size: .75rem; color: var(--text-d); cursor: pointer; transition: all .14s;
+}
+.linked-chip:hover { color: var(--gold); border-color: var(--gold); }
+.d-acts { display: flex; gap: .5rem; margin-top: 1.25rem; padding-top: 1.1rem; border-top: 1px solid var(--border); }
+
+/* Notification */
+.notif {
+  position: fixed; bottom: 1.25rem; left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--card); border: 1px solid var(--border-l);
+  padding: .65rem 1.1rem; border-radius: 2px; font-size: .82rem;
+  color: var(--text); z-index: 300; transition: transform .25s ease; white-space: nowrap;
+}
+.notif.show { transform: translateX(-50%) translateY(0); }
+.notif.ok { border-color: var(--suc); color: #5EC48A; }
+.notif.err { border-color: var(--fail); color: #C47A6B; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════ SETTINGS SCREEN ══════════════ -->
+<div id="scr-cfg" class="screen-settings">
+  <div class="cfg-card">
+    <div class="cfg-logo">MENU DB</div>
+    <div class="cfg-sub">连接到你的 GitHub 私有数据库</div>
+
+    <div class="fg">
+      <label class="fl">GitHub Personal Access Token</label>
+      <input type="password" id="cfg-tok" class="fi" placeholder="ghp_xxxxxxxxxxxx">
+      <div class="fhint">需要 repo 权限 · 不会被存储到本地</div>
+    </div>
+    <div class="fg">
+      <label class="fl">仓库所有者（用户名）</label>
+      <input type="text" id="cfg-own" class="fi" placeholder="your-username">
+    </div>
+    <div class="fg">
+      <label class="fl">私有仓库名</label>
+      <input type="text" id="cfg-rep" class="fi" placeholder="my-databases">
+    </div>
+    <div class="frow">
+      <div class="fg">
+        <label class="fl">分支</label>
+        <input type="text" id="cfg-br" class="fi" value="main">
+      </div>
+      <div class="fg">
+        <label class="fl">文件路径</label>
+        <input type="text" id="cfg-pa" class="fi" value="menu.json">
+      </div>
+    </div>
+
+    <button class="btn btn-gold" onclick="doConnect()">连 接 →</button>
+    <button class="btn btn-ghost btn-w" onclick="doOffline()">离线使用（本地缓存）</button>
+  </div>
+</div>
+
+<!-- ══════════════ APP ══════════════ -->
+<div id="app" class="app">
+
+  <!-- Header -->
+  <header class="hdr">
+    <div class="hdr-logo">MENU DB</div>
+    <div class="hdr-sep"></div>
+    <input class="hdr-search" placeholder="搜索名称、描述、标签…" oninput="onSearch(this.value)">
+    <div class="hdr-right">
+      <span class="save-st" id="save-st"></span>
+      <button class="btn btn-ghost btn-sm" id="btn-gh-save" onclick="ghSave()" style="display:none">↑ 保存至 GitHub</button>
+      <button class="btn btn-ghost btn-sm" onclick="goSettings()">设置</button>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="nav-sec-lbl">创 作 区</div>
+    <div class="nav-item" data-c="recipes"     onclick="setCat('recipes')">    <span class="nav-ico">🍳</span> 食谱 <span class="nav-ct" id="ct-recipes">0</span></div>
+    <div class="nav-item" data-c="cocktails"   onclick="setCat('cocktails')">  <span class="nav-ico">🍸</span> 调酒 <span class="nav-ct" id="ct-cocktails">0</span></div>
+    <div class="nav-item" data-c="baking"      onclick="setCat('baking')">     <span class="nav-ico">🥐</span> 烘焙 <span class="nav-ct" id="ct-baking">0</span></div>
+    <div class="nav-sec-lbl" style="margin-top:.5rem">素 材 库</div>
+    <div class="nav-item" data-c="ingredients" onclick="setCat('ingredients')"><span class="nav-ico">🥬</span> 食材 <span class="nav-ct" id="ct-ingredients">0</span></div>
+    <div class="nav-item" data-c="spirits"     onclick="setCat('spirits')">    <span class="nav-ico">🥃</span> 酒品 <span class="nav-ct" id="ct-spirits">0</span></div>
+  </nav>
+
+  <!-- Content -->
+  <main class="content" id="content"></main>
+</div>
+
+<!-- ══════════════ MODAL ══════════════ -->
+<div class="modal-bg" id="modal-bg" onclick="closeModalBg(event)">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="modal-ttl">添加</div>
+      <button class="modal-x" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body"></div>
+    <div class="modal-ftr">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">取消</button>
+      <button class="btn btn-gold btn-sm" style="width:auto" onclick="saveItem()">保 存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ DETAIL PANEL ══════════════ -->
+<div class="detail" id="detail">
+  <button class="detail-x" onclick="closeDetail()">✕</button>
+  <div id="detail-body"></div>
+</div>
+
+<!-- Notification -->
+<div class="notif" id="notif"></div>
+
+<script>
+// ═══════════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════════
+const ZONES = [
+  { id:'all',      lbl:'全 部' },
+  { id:'external', lbl:'外部区', clr:'#6B8FA8' },
+  { id:'mastered', lbl:'掌握区', clr:'#5E8F6E' },
+  { id:'idea',     lbl:'想法区', clr:'#C9963A' },
+  { id:'success',  lbl:'成功区', clr:'#4E8F74' },
+  { id:'failure',  lbl:'失败区', clr:'#A86B5E' },
+];
+const ZONE_MAP = Object.fromEntries(ZONES.slice(1).map(z=>[z.id,z]));
+
+const CATS = {
+  recipes:     { lbl:'食谱', ico:'🍳', zone:true,  acc:'#C4785A' },
+  cocktails:   { lbl:'调酒', ico:'🍸', zone:true,  acc:'#7A8EC4' },
+  baking:      { lbl:'烘焙', ico:'🥐', zone:true,  acc:'#C4A45A' },
+  ingredients: { lbl:'食材', ico:'🥬', zone:false, acc:'#5AC47A' },
+  spirits:     { lbl:'酒品', ico:'🥃', zone:false, acc:'#A45AC4' },
+};
+
+const ING_CATS   = ['蔬菜','肉类','海鲜','乳制品','谷物','调味料','坚果','水果','其他'];
+const SPI_TYPES  = ['威士忌','朗姆酒','金酒','伏特加','龙舌兰','白兰地','利口酒','葡萄酒','啤酒','清酒','中国白酒','其他'];
+
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+const S = {
+  cfg:  null,   // { token, owner, repo, branch, path } | { offline:true }
+  data: null,   // the parsed menu.json
+  sha:  null,   // github file sha
+  dirty:false,
+  ui: { cat:'recipes', zone:'all', filter:'all', q:'' },
+  editing: null,          // { id, cat } | null
+  tmp: { tags:[], ing:[], spi:[], steps:[] },
+};
+
+function today(){ return new Date().toISOString().split('T')[0]; }
+function uid()  { return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function mkData(){ return { meta:{ version:'1.0', last_updated:today() }, ingredients:[], spirits:[], recipes:[], cocktails:[], baking:[] }; }
+
+// ═══════════════════════════════════════════
+//  GITHUB API
+// ═══════════════════════════════════════════
+async function ghApi(url, opts={}){
+  const r = await fetch(url,{...opts, headers:{
+    Authorization:`Bearer ${S.cfg.token}`,
+    Accept:'application/vnd.github.v3+json',
+    'Content-Type':'application/json',
+    ...opts.headers
+  }});
+  if(!r.ok) throw new Error(`${r.status}: ${await r.text()}`);
+  return r.json();
+}
+
+async function ghLoad(){
+  const {owner,repo,branch,path} = S.cfg;
+  const f = await ghApi(`https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}&_=${Date.now()}`);
+  S.sha = f.sha;
+  const txt = decodeURIComponent(escape(atob(f.content.replace(/\n/g,''))));
+  S.data = JSON.parse(txt);
+}
+
+async function ghSave(){
+  if(!S.cfg?.token){ notify('请先连接 GitHub','err'); return; }
+  S.data.meta.last_updated = today();
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(S.data,null,2))));
+  const {owner,repo,branch,path} = S.cfg;
+  const body = { message:`Update menu.json – ${today()}`, content, branch };
+  if(S.sha) body.sha = S.sha;
+  const res = await ghApi(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`,{method:'PUT',body:JSON.stringify(body)});
+  S.sha = res.content.sha;
+  S.dirty = false;
+  updSaveStatus();
+  notify('已保存至 GitHub ✓','ok');
+}
+
+// ═══════════════════════════════════════════
+//  CONNECT
+// ═══════════════════════════════════════════
+async function doConnect(){
+  const token  = document.getElementById('cfg-tok').value.trim();
+  const owner  = document.getElementById('cfg-own').value.trim();
+  const repo   = document.getElementById('cfg-rep').value.trim();
+  const branch = document.getElementById('cfg-br').value.trim()||'main';
+  const path   = document.getElementById('cfg-pa').value.trim()||'menu.json';
+  if(!token||!owner||!repo){ notify('请填写 Token、用户名、仓库名','err'); return; }
+  S.cfg = { token, owner, repo, branch, path };
+  localStorage.setItem('menu_cfg', JSON.stringify({ owner, repo, branch, path }));
+  try {
+    notify('连接中…','');
+    await ghLoad();
+    notify('加载成功 ✓','ok');
+  } catch(e){
+    if(e.message.startsWith('404')){ S.data=mkData(); S.sha=null; notify('未找到文件，已创建空数据库','ok'); }
+    else { notify('连接失败：'+e.message,'err'); return; }
+  }
+  showApp();
+}
+
+function doOffline(){
+  S.cfg = { offline:true };
+  const saved = localStorage.getItem('menu_data_offline');
+  S.data = saved ? JSON.parse(saved) : mkData();
+  showApp();
+}
+
+function goSettings(){
+  document.getElementById('scr-cfg').style.display='flex';
+  document.getElementById('app').style.display='none';
+}
+
+function showApp(){
+  document.getElementById('scr-cfg').style.display='none';
+  document.getElementById('app').style.display='grid';
+  document.getElementById('btn-gh-save').style.display = S.cfg?.token ? 'inline-flex' : 'none';
+  renderAll();
+}
+
+// ═══════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════
+function renderAll(){ updCounts(); renderContent(); updActiveNav(); updSaveStatus(); }
+
+function updCounts(){
+  ['recipes','cocktails','baking','ingredients','spirits'].forEach(c=>{
+    const el=document.getElementById('ct-'+c);
+    if(el) el.textContent=(S.data[c]||[]).length;
+  });
+}
+
+function updActiveNav(){
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    el.classList.toggle('active', el.dataset.c===S.ui.cat);
+  });
+}
+
+function updSaveStatus(){
+  const el=document.getElementById('save-st');
+  if(!el) return;
+  el.textContent = S.dirty ? '● 未保存' : (S.cfg?.offline ? '离线模式' : '已同步');
+  el.style.color  = S.dirty ? 'var(--idea)' : (S.cfg?.offline ? 'var(--text-dd)' : 'var(--suc)');
+}
+
+function markDirty(){
+  S.dirty=true; updSaveStatus();
+  if(S.cfg?.offline) localStorage.setItem('menu_data_offline',JSON.stringify(S.data));
+}
+
+function setCat(cat){ S.ui.cat=cat; S.ui.zone='all'; S.ui.filter='all'; closeDetail(); renderAll(); }
+function setZone(z){ S.ui.zone=z; renderContent(); }
+function setFilter(f){ S.ui.filter=f; renderContent(); }
+function onSearch(v){ S.ui.q=v; renderContent(); }
+
+function renderContent(){
+  const cat=S.ui.cat, info=CATS[cat];
+  const items=S.data[cat]||[];
+  const q=S.ui.q.toLowerCase();
+  let filtered = q ? items.filter(i=>
+    i.name.toLowerCase().includes(q)||
+    (i.description||'').toLowerCase().includes(q)||
+    (i.tags||[]).some(t=>t.toLowerCase().includes(q))
+  ) : items;
+
+  let html = `<div class="ch">
+    <div class="ch-left">
+      <span style="font-size:1.4rem">${info.ico}</span>
+      <span class="ch-title">${info.lbl}</span>
+      <span class="ch-count">${filtered.length} 项</span>
+    </div>
+    <button class="btn btn-gold btn-sm" style="width:auto" onclick="openAdd()">＋ 添加</button>
+  </div>`;
+
+  if(info.zone){
+    html+=`<div class="ztabs">`;
+    ZONES.forEach(z=>{
+      const cnt = z.id==='all' ? items.length : items.filter(i=>i.zone===z.id).length;
+      const ac  = S.ui.zone===z.id ? 'active' : '';
+      const st  = (ac&&z.clr) ? `background:${z.clr};` : '';
+      html+=`<button class="ztab ${ac}" style="${st}" onclick="setZone('${z.id}')">${z.lbl} (${cnt})</button>`;
+    });
+    html+=`</div>`;
+    if(S.ui.zone!=='all') filtered=filtered.filter(i=>i.zone===S.ui.zone);
+  } else {
+    const key = cat==='ingredients' ? 'category' : 'type';
+    const uniq = [...new Set(items.map(i=>i[key]).filter(Boolean))];
+    if(uniq.length){
+      html+=`<div class="flt-row">
+        <button class="flt-btn ${S.ui.filter==='all'?'active':''}" onclick="setFilter('all')">全部</button>`;
+      uniq.forEach(v=>{ html+=`<button class="flt-btn ${S.ui.filter===v?'active':''}" onclick="setFilter('${esc(v)}')">${v}</button>`; });
+      html+=`</div>`;
+      if(S.ui.filter!=='all') filtered=filtered.filter(i=>i[key]===S.ui.filter);
+    }
+  }
+
+  if(!filtered.length){
+    html+=`<div class="empty"><div class="empty-ico">${info.ico}</div><div class="empty-txt">${q?'无搜索结果':'暂无数据，点击「添加」开始记录'}</div></div>`;
+  } else {
+    html+=`<div class="card-grid">`;
+    filtered.forEach(item=>{ html+=renderCard(item,cat,info); });
+    html+=`</div>`;
+  }
+
+  document.getElementById('content').innerHTML=html;
+}
+
+function renderCard(item,cat,info){
+  const z   = item.zone ? ZONE_MAP[item.zone] : null;
+  const barC = z ? z.clr : info.acc;
+  let badge='';
+  if(z) badge=`<span class="card-zone" style="background:${z.clr}22;color:${z.clr}">${z.lbl}</span>`;
+  if(cat==='ingredients'&&item.category) badge=`<span class="card-zone" style="background:var(--ing)22;color:var(--ing)">${item.category}</span>`;
+  if(cat==='spirits'&&item.type) badge=`<span class="card-zone" style="background:var(--spi)22;color:var(--spi)">${item.type}${item.abv?` ${item.abv}%`:''}</span>`;
+
+  const ingN=(item.ingredient_ids||[]).length;
+  const spiN=(item.spirit_ids||[]).length;
+  const feet=[];
+  if(ingN) feet.push(`🥬 ${ingN}`);
+  if(spiN) feet.push(`🥃 ${spiN}`);
+  if((item.steps||[]).length) feet.push(`📋 ${item.steps.length} 步`);
+
+  const tags=(item.tags||[]).slice(0,4).map(t=>`<span class="card-tag">${t}</span>`).join('');
+
+  return `<div class="card" onclick="showDetail('${item.id}','${cat}')">
+    <div class="card-bar" style="background:${barC}"></div>
+    ${badge}
+    <div class="card-name">${esc(item.name)}</div>
+    ${item.description?`<div class="card-desc">${esc(item.description)}</div>`:''}
+    ${tags?`<div class="card-tags">${tags}</div>`:''}
+    ${feet.length?`<div class="card-foot">${feet.join(' · ')}</div>`:''}
+    ${item.source?`<div class="card-src">来源：${esc(item.source)}</div>`:''}
+  </div>`;
+}
+
+// ═══════════════════════════════════════════
+//  DETAIL PANEL
+// ═══════════════════════════════════════════
+function showDetail(id,cat){
+  const item=S.data[cat].find(i=>i.id===id);
+  if(!item) return;
+  const info=CATS[cat];
+  const z=item.zone?ZONE_MAP[item.zone]:null;
+  let h='';
+
+  // Badge
+  if(z) h+=`<span class="card-zone" style="background:${z.clr}22;color:${z.clr}">${z.lbl}</span>`;
+  if(cat==='ingredients'&&item.category) h+=`<span class="card-zone" style="background:var(--ing)22;color:var(--ing)">${item.category}</span>`;
+  if(cat==='spirits'&&item.type) h+=`<span class="card-zone" style="background:var(--spi)22;color:var(--spi)">${item.type}${item.abv?' · '+item.abv+'%':''}</span>`;
+
+  h+=`<div class="d-name">${esc(item.name)}</div>`;
+  if(item.source) h+=`<div class="d-src">来源：${esc(item.source)}</div>`;
+  if(item.origin) h+=`<div class="d-src">产地：${esc(item.origin)}</div>`;
+  if(item.description) h+=`<div class="d-sec"><div class="d-sec-lbl">简介</div><div class="d-text">${esc(item.description)}</div></div>`;
+
+  if((item.ingredient_ids||[]).length){
+    const chips=item.ingredient_ids.map(id=>{
+      const ing=S.data.ingredients.find(i=>i.id===id);
+      return ing?`<span class="linked-chip" onclick="jumpTo('${id}','ingredients')">${esc(ing.name)}</span>`:'';
+    }).join('');
+    h+=`<div class="d-sec"><div class="d-sec-lbl">食材</div><div class="linked-chips">${chips}</div></div>`;
+  }
+  if((item.spirit_ids||[]).length){
+    const chips=item.spirit_ids.map(id=>{
+      const spi=S.data.spirits.find(i=>i.id===id);
+      return spi?`<span class="linked-chip" onclick="jumpTo('${id}','spirits')">${esc(spi.name)}</span>`:'';
+    }).join('');
+    h+=`<div class="d-sec"><div class="d-sec-lbl">酒品</div><div class="linked-chips">${chips}</div></div>`;
+  }
+  if((item.steps||[]).length){
+    h+=`<div class="d-sec"><div class="d-sec-lbl">步骤</div><ol class="steps-ol">`;
+    item.steps.forEach(s=>{ h+=`<li>${esc(s)}</li>`; });
+    h+=`</ol></div>`;
+  }
+  if(item.notes) h+=`<div class="d-sec"><div class="d-sec-lbl">备注</div><div class="d-text">${esc(item.notes)}</div></div>`;
+  if((item.tags||[]).length) h+=`<div class="d-sec"><div class="d-sec-lbl">标签</div><div class="card-tags">${item.tags.map(t=>`<span class="card-tag">${esc(t)}</span>`).join('')}</div></div>`;
+
+  // Used in
+  if(!info.zone){
+    const key=cat==='ingredients'?'ingredient_ids':'spirit_ids';
+    const used=[];
+    ['recipes','cocktails','baking'].forEach(c=>{ (S.data[c]||[]).forEach(it=>{ if((it[key]||[]).includes(id)) used.push({c,it}); }); });
+    if(used.length){
+      const chips=used.map(({c,it})=>`<span class="linked-chip" onclick="jumpTo('${it.id}','${c}')">${CATS[c].ico} ${esc(it.name)}</span>`).join('');
+      h+=`<div class="d-sec"><div class="d-sec-lbl">使用于</div><div class="linked-chips">${chips}</div></div>`;
+    }
+  }
+
+  h+=`<div class="d-acts">
+    <button class="btn btn-ghost btn-sm" onclick="openEdit('${id}','${cat}')">编辑</button>
+    <button class="btn btn-danger btn-sm" onclick="delItem('${id}','${cat}')">删除</button>
+  </div>`;
+
+  document.getElementById('detail-body').innerHTML=h;
+  document.getElementById('detail').classList.add('open');
+}
+
+function closeDetail(){ document.getElementById('detail').classList.remove('open'); }
+
+function jumpTo(id,cat){
+  S.ui.cat=cat; S.ui.zone='all'; closeDetail(); renderAll();
+  setTimeout(()=>showDetail(id,cat),120);
+}
+
+// ═══════════════════════════════════════════
+//  MODAL – ADD / EDIT
+// ═══════════════════════════════════════════
+function openAdd(){
+  S.editing=null;
+  S.tmp={ tags:[], ing:[], spi:[], steps:[] };
+  document.getElementById('modal-ttl').textContent=`添加${CATS[S.ui.cat].lbl}`;
+  document.getElementById('modal-body').innerHTML=buildForm(S.ui.cat,null);
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function openEdit(id,cat){
+  const item=S.data[cat].find(i=>i.id===id);
+  if(!item) return;
+  S.editing={id,cat};
+  S.tmp={ tags:[...(item.tags||[])], ing:[...(item.ingredient_ids||[])], spi:[...(item.spirit_ids||[])], steps:[...(item.steps||[])] };
+  document.getElementById('modal-ttl').textContent=`编辑${CATS[cat].lbl}`;
+  document.getElementById('modal-body').innerHTML=buildForm(cat,item);
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function closeModal(){ document.getElementById('modal-bg').classList.remove('open'); }
+function closeModalBg(e){ if(e.target===document.getElementById('modal-bg')) closeModal(); }
+
+function field(lbl,inner){ return `<div class="fg"><label class="fl">${lbl}</label>${inner}</div>`; }
+
+function buildForm(cat,v){
+  const d=v||{};
+  let h='';
+  h+=field('名称',`<input class="fi" id="f-name" value="${esc(d.name||'')}" placeholder="输入名称">`);
+
+  if(cat==='ingredients'){
+    h+=field('分类',`<select class="fs" id="f-cat"><option value="">选择分类</option>${ING_CATS.map(c=>`<option value="${c}"${d.category===c?' selected':''}>${c}</option>`).join('')}</select>`);
+  } else if(cat==='spirits'){
+    h+=field('类型',`<select class="fs" id="f-type"><option value="">选择类型</option>${SPI_TYPES.map(t=>`<option value="${t}"${d.type===t?' selected':''}>${t}</option>`).join('')}</select>`);
+    h+=`<div class="frow2">`;
+    h+=field('产地',`<input class="fi" id="f-origin" value="${esc(d.origin||'')}">`);
+    h+=field('酒精度 ABV%',`<input class="fi" id="f-abv" type="number" min="0" max="100" step="0.1" value="${d.abv||''}">`);
+    h+=`</div>`;
+  } else {
+    h+=field('区域',`<select class="fs" id="f-zone" onchange="onZoneChange()"><option value="">选择区域</option>${ZONES.slice(1).map(z=>`<option value="${z.id}"${d.zone===z.id?' selected':''}>${z.lbl}</option>`).join('')}</select>`);
+    const showSrc=d.zone==='external'||d.zone==='mastered';
+    h+=`<div id="src-wrap"${showSrc?'':' style="display:none"'}>`+field('来源',`<input class="fi" id="f-src" value="${esc(d.source||'')}" placeholder="书名 / 网站 / 人名">`)+`</div>`;
+  }
+
+  h+=field('描述',`<textarea class="fi fta" id="f-desc" placeholder="简短描述…">${esc(d.description||'')}</textarea>`);
+
+  if(cat!=='ingredients'&&cat!=='spirits'){
+    h+=field('关联食材', buildAssoc('ing', S.data.ingredients, S.tmp.ing, '搜索食材…'));
+    h+=field('关联酒品',  buildAssoc('spi', S.data.spirits,      S.tmp.spi, '搜索酒品…'));
+    h+=field('步骤',      buildStepsUI());
+  }
+
+  h+=field('备注',`<textarea class="fi fta" id="f-notes" placeholder="补充说明…">${esc(d.notes||'')}</textarea>`);
+  h+=field('标签', buildTagsUI());
+  return h;
+}
+
+function onZoneChange(){
+  const z=document.getElementById('f-zone')?.value;
+  const w=document.getElementById('src-wrap');
+  if(w) w.style.display=(z==='external'||z==='mastered')?'':'none';
+}
+
+// ── Association picker ──
+function buildAssoc(type, all, sel, ph){
+  const chips=sel.map(id=>{
+    const it=all.find(i=>i.id===id);
+    return it?`<span class="chip">${esc(it.name)}<span class="chip-x" onclick="rmAssoc('${type}','${id}')">×</span></span>`:'';
+  }).join('');
+  return `<div>
+    <div class="chips-box" id="${type}-chips">${chips}</div>
+    <div class="rel" style="margin-top:.35rem">
+      <input class="fi" style="margin-top:0" placeholder="${ph}" oninput="srchAssoc('${type}',this.value)" id="${type}-si" autocomplete="off">
+      <div class="assoc-dd" id="${type}-dd"></div>
+    </div>
+  </div>`;
+}
+
+function srchAssoc(type,val){
+  const all=type==='ing'?S.data.ingredients:S.data.spirits;
+  const sel=type==='ing'?S.tmp.ing:S.tmp.spi;
+  const dd=document.getElementById(`${type}-dd`);
+  if(!val.trim()){ dd.style.display='none'; return; }
+  const hits=all.filter(i=>i.name.toLowerCase().includes(val.toLowerCase())&&!sel.includes(i.id)).slice(0,8);
+  if(!hits.length){ dd.style.display='none'; return; }
+  dd.innerHTML=hits.map(i=>`<div class="assoc-opt" onclick="selAssoc('${type}','${i.id}','${esc(i.name)}')">${esc(i.name)}</div>`).join('');
+  dd.style.display='block';
+}
+
+function selAssoc(type,id,name){
+  if(type==='ing') S.tmp.ing.push(id); else S.tmp.spi.push(id);
+  const box=document.getElementById(`${type}-chips`);
+  const sp=document.createElement('span'); sp.className='chip';
+  sp.innerHTML=`${name}<span class="chip-x" onclick="rmAssoc('${type}','${id}')">×</span>`;
+  box.appendChild(sp);
+  document.getElementById(`${type}-si`).value='';
+  document.getElementById(`${type}-dd`).style.display='none';
+}
+
+function rmAssoc(type,id){
+  if(type==='ing') S.tmp.ing=S.tmp.ing.filter(i=>i!==id);
+  else S.tmp.spi=S.tmp.spi.filter(i=>i!==id);
+  const all=type==='ing'?S.data.ingredients:S.data.spirits;
+  const sel=type==='ing'?S.tmp.ing:S.tmp.spi;
+  const box=document.getElementById(`${type}-chips`);
+  box.innerHTML=sel.map(sid=>{ const it=all.find(i=>i.id===sid); return it?`<span class="chip">${esc(it.name)}<span class="chip-x" onclick="rmAssoc('${type}','${sid}')">×</span></span>`:''; }).join('');
+}
+
+// ── Steps ──
+function buildStepsUI(){
+  return `<div id="steps-list">${renderStepRows()}</div>
+    <button class="btn btn-ghost btn-sm" style="margin-top:.35rem" onclick="addStep()">＋ 添加步骤</button>`;
+}
+
+function renderStepRows(){
+  return S.tmp.steps.map((s,i)=>`
+    <div class="step-row">
+      <span class="step-num">${i+1}</span>
+      <input class="fi" style="flex:1" value="${esc(s)}" oninput="S.tmp.steps[${i}]=this.value">
+      <button class="btn btn-ghost btn-sm" style="padding:.35rem .55rem" onclick="rmStep(${i})">×</button>
+    </div>`).join('');
+}
+
+function addStep(){ S.tmp.steps.push(''); document.getElementById('steps-list').innerHTML=renderStepRows(); }
+function rmStep(i){ S.tmp.steps.splice(i,1); document.getElementById('steps-list').innerHTML=renderStepRows(); }
+
+// ── Tags ──
+function buildTagsUI(){
+  const chips=S.tmp.tags.map(t=>`<span class="chip">${esc(t)}<span class="chip-x" onclick="rmTag('${esc(t)}')">×</span></span>`).join('');
+  return `<div class="chips-box" id="tags-box" onclick="document.getElementById('tags-inp').focus()">
+    ${chips}
+    <input class="tags-inp" id="tags-inp" placeholder="输入后按 Enter 或逗号" onkeydown="onTagKey(event)">
+  </div>`;
+}
+
+function onTagKey(e){
+  if(e.key==='Enter'||e.key===','){
+    e.preventDefault();
+    const v=e.target.value.trim();
+    if(v&&!S.tmp.tags.includes(v)){
+      S.tmp.tags.push(v);
+      const sp=document.createElement('span'); sp.className='chip';
+      sp.innerHTML=`${esc(v)}<span class="chip-x" onclick="rmTag('${esc(v)}')">×</span>`;
+      document.getElementById('tags-box').insertBefore(sp,e.target);
+    }
+    e.target.value='';
+  }
+}
+
+function rmTag(t){
+  S.tmp.tags=S.tmp.tags.filter(x=>x!==t);
+  const inp=document.getElementById('tags-inp');
+  const box=document.getElementById('tags-box');
+  box.innerHTML=S.tmp.tags.map(tag=>`<span class="chip">${esc(tag)}<span class="chip-x" onclick="rmTag('${esc(tag)}')">×</span></span>`).join('')+inp.outerHTML;
+}
+
+// ── Save item ──
+function saveItem(){
+  const cat=S.editing?S.editing.cat:S.ui.cat;
+  const name=document.getElementById('f-name')?.value.trim();
+  if(!name){ notify('请输入名称','err'); return; }
+
+  const item={
+    id:         S.editing ? S.editing.id : uid(),
+    name,
+    description: document.getElementById('f-desc')?.value.trim()||'',
+    notes:       document.getElementById('f-notes')?.value.trim()||'',
+    tags:        [...S.tmp.tags],
+    date_modified: today(),
+  };
+
+  if(cat==='ingredients'){
+    item.category=document.getElementById('f-cat')?.value||'';
+  } else if(cat==='spirits'){
+    item.type=  document.getElementById('f-type')?.value||'';
+    item.origin=document.getElementById('f-origin')?.value.trim()||'';
+    const abvV=parseFloat(document.getElementById('f-abv')?.value);
+    item.abv=isNaN(abvV)?null:abvV;
+  } else {
+    item.zone=          document.getElementById('f-zone')?.value||'idea';
+    item.source=        document.getElementById('f-src')?.value.trim()||'';
+    item.ingredient_ids=[...S.tmp.ing];
+    item.spirit_ids=    [...S.tmp.spi];
+    item.steps=         S.tmp.steps.filter(s=>s.trim());
+  }
+
+  if(!S.editing){
+    item.date_added=today();
+    S.data[cat].push(item);
+  } else {
+    const idx=S.data[cat].findIndex(i=>i.id===S.editing.id);
+    if(idx>=0) S.data[cat][idx]=item;
+  }
+
+  markDirty(); closeModal(); renderAll();
+  notify(`已${S.editing?'更新':'添加'}「${name}」`,'ok');
+  setTimeout(()=>showDetail(item.id,cat),80);
+}
+
+function delItem(id,cat){
+  const it=S.data[cat].find(i=>i.id===id);
+  if(!it||!confirm(`确认删除「${it.name}」？`)) return;
+  S.data[cat]=S.data[cat].filter(i=>i.id!==id);
+  markDirty(); closeDetail(); renderAll();
+  notify(`已删除「${it.name}」`,'');
+}
+
+// ═══════════════════════════════════════════
+//  NOTIFY
+// ═══════════════════════════════════════════
+let _ntimer;
+function notify(msg,type=''){
+  const el=document.getElementById('notif');
+  el.textContent=msg; el.className=`notif show ${type}`;
+  clearTimeout(_ntimer); _ntimer=setTimeout(()=>el.classList.remove('show'),2600);
+}
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+// Restore non-sensitive config
+try {
+  const c=JSON.parse(localStorage.getItem('menu_cfg')||'{}');
+  if(c.owner) document.getElementById('cfg-own').value=c.owner;
+  if(c.repo)  document.getElementById('cfg-rep').value=c.repo;
+  if(c.branch)document.getElementById('cfg-br').value=c.branch;
+  if(c.path)  document.getElementById('cfg-pa').value=c.path;
+} catch(e){}
+
+// Close dropdowns on outside click
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.rel'))
+    document.querySelectorAll('.assoc-dd').forEach(d=>d.style.display='none');
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){ closeModal(); closeDetail(); }
+  if((e.metaKey||e.ctrlKey)&&e.key==='s'){ e.preventDefault(); ghSave(); }
+});
+</script>
+</body>
+</html>
