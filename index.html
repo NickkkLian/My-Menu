@@ -233,16 +233,27 @@ body { font-family: 'Noto Serif SC', serif; background: var(--bg); color: var(--
 .chip-x:hover { color: var(--fail); }
 .tags-inp { background: none; border: none; outline: none; color: var(--text); font-family: 'Noto Serif SC', serif; font-size: .84rem; min-width: 70px; flex: 1; }
 
-/* Assoc dropdown */
-.rel { position: relative; }
-.assoc-dd {
-  position: absolute; z-index: 20; top: 100%; left: 0; right: 0;
-  background: var(--card-h); border: 1px solid var(--border-l);
-  border-radius: 2px; max-height: 180px; overflow-y: auto;
-  box-shadow: 0 6px 24px rgba(0,0,0,.6); display: none;
+/* Assoc list picker */
+.assoc-wrap { background: var(--surface); border: 1px solid var(--border-l); border-radius: 2px; overflow: hidden; }
+.assoc-search {
+  width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--border);
+  padding: .5rem .75rem; color: var(--text); font-family: 'Noto Serif SC', serif;
+  font-size: .82rem; outline: none;
 }
-.assoc-opt { padding: .55rem .9rem; cursor: pointer; font-size: .83rem; color: var(--text-d); transition: all .1s; }
-.assoc-opt:hover { background: var(--card); color: var(--text); }
+.assoc-search::placeholder { color: var(--text-dd); }
+.assoc-list { max-height: 150px; overflow-y: auto; }
+.assoc-item {
+  display: flex; align-items: center; padding: .42rem .75rem;
+  cursor: pointer; font-size: .83rem; color: var(--text-d);
+  transition: background .1s; gap: .5rem; border-bottom: 1px solid var(--border);
+}
+.assoc-item:last-child { border-bottom: none; }
+.assoc-item:hover { background: var(--card); color: var(--text); }
+.assoc-item.on { color: var(--gold); background: rgba(201,150,58,.07); }
+.assoc-item.on .assoc-chk { opacity:1; }
+.assoc-chk { margin-left:auto; opacity:0; color:var(--gold); font-size:.8rem; transition:opacity .1s; }
+.assoc-sub { font-size:.68rem; color:var(--text-dd); }
+.assoc-foot { font-size:.7rem; color:var(--text-dd); padding:.3rem .75rem; }
 
 /* Steps */
 .step-row { display: flex; gap: .5rem; margin-bottom: .45rem; align-items: center; }
@@ -528,9 +539,21 @@ function updSaveStatus(){
   el.style.color  = S.dirty ? 'var(--idea)' : (S.cfg?.offline ? 'var(--text-dd)' : 'var(--suc)');
 }
 
+let _syncTimer;
 function markDirty(){
-  S.dirty=true; updSaveStatus();
+  S.dirty=true;
   if(S.cfg?.offline) localStorage.setItem('menu_data_offline',JSON.stringify(S.data));
+  if(S.cfg?.token){
+    clearTimeout(_syncTimer);
+    const st=document.getElementById('save-st');
+    if(st){ st.textContent='● 3s 后同步…'; st.style.color='var(--idea)'; }
+    _syncTimer=setTimeout(async()=>{
+      const st2=document.getElementById('save-st');
+      if(st2){ st2.textContent='同步中…'; st2.style.color='var(--text-d)'; }
+      try{ await ghSave(); }
+      catch(e){ notify('自动同步失败：'+e.message,'err'); S.dirty=true; updSaveStatus(); }
+    },3000);
+  } else { updSaveStatus(); }
 }
 
 function setCat(cat){ S.ui.cat=cat; S.ui.zone='all'; S.ui.filter='all'; closeDetail(); renderAll(); }
@@ -751,49 +774,41 @@ function onZoneChange(){
   if(w) w.style.display=(z==='external'||z==='mastered')?'':'none';
 }
 
-// ── Association picker ──
+// ── Association picker (scrollable list with toggle) ──
 function buildAssoc(type, all, sel, ph){
-  const chips=sel.map(id=>{
-    const it=all.find(i=>i.id===id);
-    return it?`<span class="chip">${esc(it.name)}<span class="chip-x" onclick="rmAssoc('${type}','${id}')">×</span></span>`:'';
+  const empty=`<div style="padding:.6rem .75rem;font-size:.78rem;color:var(--text-dd)">暂无数据，请先在素材库添加</div>`;
+  const rows=all.map(it=>{
+    const on=sel.includes(it.id)?'on':'';
+    const sub=it.category||it.type||'';
+    return `<div class="assoc-item ${on}" data-id="${it.id}" onclick="toggleAssoc('${type}','${it.id}')">
+      <span>${esc(it.name)}</span>
+      ${sub?`<span class="assoc-sub">${sub}</span>`:''}
+      <span class="assoc-chk">✓</span>
+    </div>`;
   }).join('');
-  return `<div>
-    <div class="chips-box" id="${type}-chips">${chips}</div>
-    <div class="rel" style="margin-top:.35rem">
-      <input class="fi" style="margin-top:0" placeholder="${ph}" oninput="srchAssoc('${type}',this.value)" id="${type}-si" autocomplete="off">
-      <div class="assoc-dd" id="${type}-dd"></div>
-    </div>
+  return `<div class="assoc-wrap">
+    <input class="assoc-search" placeholder="${ph}" oninput="filterAssoc('${type}',this.value)">
+    <div class="assoc-list" id="${type}-list">${all.length?rows:empty}</div>
+    <div class="assoc-foot">已选 <span id="${type}-ct">${sel.length}</span> 项</div>
   </div>`;
 }
 
-function srchAssoc(type,val){
-  const all=type==='ing'?S.data.ingredients:S.data.spirits;
+function toggleAssoc(type,id){
   const sel=type==='ing'?S.tmp.ing:S.tmp.spi;
-  const dd=document.getElementById(`${type}-dd`);
-  if(!val.trim()){ dd.style.display='none'; return; }
-  const hits=all.filter(i=>i.name.toLowerCase().includes(val.toLowerCase())&&!sel.includes(i.id)).slice(0,8);
-  if(!hits.length){ dd.style.display='none'; return; }
-  dd.innerHTML=hits.map(i=>`<div class="assoc-opt" onclick="selAssoc('${type}','${i.id}','${esc(i.name)}')">${esc(i.name)}</div>`).join('');
-  dd.style.display='block';
+  const idx=sel.indexOf(id);
+  if(idx>=0) sel.splice(idx,1); else sel.push(id);
+  const el=document.querySelector(`#${type}-list [data-id="${id}"]`);
+  if(el) el.classList.toggle('on', sel.includes(id));
+  const ct=document.getElementById(`${type}-ct`);
+  if(ct) ct.textContent=sel.length;
 }
 
-function selAssoc(type,id,name){
-  if(type==='ing') S.tmp.ing.push(id); else S.tmp.spi.push(id);
-  const box=document.getElementById(`${type}-chips`);
-  const sp=document.createElement('span'); sp.className='chip';
-  sp.innerHTML=`${name}<span class="chip-x" onclick="rmAssoc('${type}','${id}')">×</span>`;
-  box.appendChild(sp);
-  document.getElementById(`${type}-si`).value='';
-  document.getElementById(`${type}-dd`).style.display='none';
-}
-
-function rmAssoc(type,id){
-  if(type==='ing') S.tmp.ing=S.tmp.ing.filter(i=>i!==id);
-  else S.tmp.spi=S.tmp.spi.filter(i=>i!==id);
-  const all=type==='ing'?S.data.ingredients:S.data.spirits;
-  const sel=type==='ing'?S.tmp.ing:S.tmp.spi;
-  const box=document.getElementById(`${type}-chips`);
-  box.innerHTML=sel.map(sid=>{ const it=all.find(i=>i.id===sid); return it?`<span class="chip">${esc(it.name)}<span class="chip-x" onclick="rmAssoc('${type}','${sid}')">×</span></span>`:''; }).join('');
+function filterAssoc(type,val){
+  const list=document.getElementById(`${type}-list`);
+  if(!list) return;
+  list.querySelectorAll('.assoc-item').forEach(el=>{
+    el.style.display=el.textContent.toLowerCase().includes(val.toLowerCase())?'':'none';
+  });
 }
 
 // ── Steps ──
@@ -924,12 +939,6 @@ function notify(msg,type=''){
     }
   } catch(e){ console.warn('Auto-connect failed:',e); }
 })();
-
-// Close dropdowns on outside click
-document.addEventListener('click',e=>{
-  if(!e.target.closest('.rel'))
-    document.querySelectorAll('.assoc-dd').forEach(d=>d.style.display='none');
-});
 
 // Keyboard shortcuts
 document.addEventListener('keydown',e=>{
