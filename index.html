@@ -350,6 +350,7 @@ body { font-family: 'Noto Serif SC', serif; background: var(--bg); color: var(--
     <div class="hdr-right">
       <span class="save-st" id="save-st"></span>
       <button class="btn btn-ghost btn-sm" id="btn-gh-save" onclick="ghSave()" style="display:none">↑ 保存至 GitHub</button>
+      <button class="btn btn-ghost btn-sm" id="btn-publish" onclick="publishPublic()" title="发布勾选了「公开展示」的菜品到个人网站数据">🌐 发布公开</button>
       <button class="btn btn-ghost btn-sm" onclick="goSettings()">设置</button>
     </div>
   </header>
@@ -470,6 +471,52 @@ async function ghSave(){
   S.dirty = false;
   updSaveStatus();
   notify('已保存至 GitHub ✓','ok');
+}
+
+// 公开数据：仅菜品类（食谱/调酒/烘焙）；配料只导出名称，notes 私人备注不出
+function buildPublicData(){
+  const cats=[['recipes','食谱'],['cocktails','调酒'],['baking','烘焙']];
+  const nameOf=(list,id)=>{const x=(list||[]).find(i=>i.id===id);return x?x.name:null};
+  const sections=[];
+  for(const [cat,label] of cats){
+    const pub=(S.data[cat]||[]).filter(i=>i.public);
+    if(!pub.length) continue;
+    sections.push({type:cat,label,items:pub.map(it=>{
+      const ing=[...(it.ingredient_ids||[]).map(id=>nameOf(S.data.ingredients,id)),...(it.spirit_ids||[]).map(id=>nameOf(S.data.spirits,id))].filter(Boolean);
+      const parts=[];
+      if(ing.length) parts.push('配料：'+ing.join('、'));
+      if((it.steps||[]).length) parts.push(it.steps.join('\n'));
+      return {id:it.id,name:it.name||'',summary:it.description||'',category:label,content:parts.join('\n\n'),tags:it.tags||[],updatedAt:it.date_modified||''};
+    })});
+  }
+  return {dbId:'menu',title:'私房菜单',generatedAt:new Date().toISOString(),sections};
+}
+// 发布公开数据：直接写入 GitHub 数据仓库（与主数据同仓库，根目录）；
+// 未配置 GitHub 或发布失败时回退为本地下载
+async function publishPublic(){
+  if(!S.data){notify('数据未加载','err');return}
+  const data=buildPublicData();
+  const count=data.sections.reduce((n,s)=>n+s.items.length,0);
+  if(!count){notify('还没有勾选「公开展示」的条目','err');return}
+  const filename='menu.public.json',json=JSON.stringify(data,null,2);
+  if(S.cfg?.token){
+    try{
+      const PUBLIC_REPO='Database-Public'; // 公开数据专用仓库（public）——网站只从这里读取，碰不到私有库
+      const {owner}=S.cfg;
+      const base=`https://api.github.com/repos/${owner}/${PUBLIC_REPO}/contents/${filename}`;
+      let sha;
+      try{ sha=(await ghApi(`${base}?_=${Date.now()}`)).sha; }catch(e){ sha=undefined; }
+      const body={message:`publish ${filename} (${count} entries)`,content:btoa(unescape(encodeURIComponent(json)))};
+      if(sha)body.sha=sha;
+      await ghApi(base,{method:'PUT',body:JSON.stringify(body)});
+      notify(`已发布 ${count} 条公开内容 → ${filename} ✓`,'ok');
+      return;
+    }catch(e){notify('发布失败：'+e.message+'，已转为本地下载','err')}
+  }
+  const blob=new Blob([json],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  notify(`已导出 ${count} 条公开内容（本地下载）`,'ok');
 }
 
 // ═══════════════════════════════════════════
@@ -753,6 +800,7 @@ function buildForm(cat,v){
     h+=field('区域',`<select class="fs" id="f-zone" onchange="onZoneChange()"><option value="">选择区域</option>${ZONES.slice(1).map(z=>`<option value="${z.id}"${d.zone===z.id?' selected':''}>${z.lbl}</option>`).join('')}</select>`);
     const showSrc=d.zone==='external'||d.zone==='mastered';
     h+=`<div id="src-wrap"${showSrc?'':' style="display:none"'}>`+field('来源',`<input class="fi" id="f-src" value="${esc(d.source||'')}" placeholder="书名 / 网站 / 人名">`)+`</div>`;
+    h+=field('公开展示',`<label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="f-public"${d.public?' checked':''}> 勾选后「发布公开」会包含此条目</label>`);
   }
 
   h+=field('描述',`<textarea class="fi fta" id="f-desc" placeholder="简短描述…">${esc(d.description||'')}</textarea>`);
@@ -887,6 +935,7 @@ function saveItem(){
     item.ingredient_ids=[...S.tmp.ing];
     item.spirit_ids=    [...S.tmp.spi];
     item.steps=         S.tmp.steps.filter(s=>s.trim());
+    item.public=        !!document.getElementById('f-public')?.checked;
   }
 
   if(!S.editing){
