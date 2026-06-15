@@ -976,8 +976,8 @@ function notify(msg,type=''){
 (async()=>{
   try {
     const c=JSON.parse(localStorage.getItem('menu_cfg')||'{}');
-    /* [hub-portal] 令牌为空时从共享配置 pha-config 读 owner+token（附加，安全合并，不覆盖已填，不改 repo/path） */
-    try{var _pha=JSON.parse(localStorage.getItem('pha-config')||'null');if(_pha&&_pha.token&&!c.token){c.owner=c.owner||_pha.owner;c.token=_pha.token;}}catch(e){}
+  /* [hub-portal] 从共享配置 pha-config 补全 owner/repo/token（仅填空缺，不覆盖已填，不改 path） */
+  try{var _pha=JSON.parse(localStorage.getItem('pha-config')||'null');if(_pha){if(!c.owner&&_pha.owner)c.owner=_pha.owner;if(!c.repo&&_pha.repo)c.repo=_pha.repo;if(!c.token&&_pha.token)c.token=_pha.token;}}catch(e){}
     if(c.token) document.getElementById('cfg-tok').value=c.token;
     if(c.owner) document.getElementById('cfg-own').value=c.owner;
     if(c.repo)  document.getElementById('cfg-rep').value=c.repo;
