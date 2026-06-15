@@ -300,6 +300,32 @@ body { font-family: 'Noto Serif SC', serif; background: var(--bg); color: var(--
 .notif.show { transform: translateX(-50%) translateY(0); }
 .notif.ok { border-color: var(--suc); color: #5EC48A; }
 .notif.err { border-color: var(--fail); color: #C47A6B; }
+
+/* [hub-mobile] 手机端适配：侧边栏收成顶部横向条，头部换行，内容全宽 */
+@media (max-width: 640px) {
+  html, body { overflow: auto; height: auto; }
+  .app { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; height: auto; min-height: 100vh; }
+  .hdr { flex-wrap: wrap; height: auto; padding: .6rem .9rem; gap: .5rem .75rem; }
+  .hdr-logo { font-size: 1rem; }
+  .hdr-search { order: 3; flex: 1 1 100%; max-width: none; }
+  .hdr-right { margin-left: auto; }
+  .sidebar {
+    border-right: none; border-bottom: 1px solid var(--border);
+    display: flex; flex-direction: row; align-items: center;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    padding: .35rem .5rem; gap: .25rem;
+  }
+  .nav-sec-lbl { display: none; }
+  .nav-item {
+    border-left: none; border-bottom: 2px solid transparent;
+    white-space: nowrap; flex: 0 0 auto; padding: .5rem .7rem;
+  }
+  .nav-item.active { border-left-color: transparent; border-bottom-color: var(--gold); }
+  .content { padding: 1rem; }
+  .ch { flex-wrap: wrap; gap: .5rem; }
+  .ch-title { font-size: 1.4rem; }
+  .card-grid { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
