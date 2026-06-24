@@ -334,34 +334,34 @@ body { font-family: 'Noto Serif SC', serif; background: var(--bg); color: var(--
 <div id="scr-cfg" class="screen-settings">
   <div class="cfg-card">
     <div class="cfg-logo">MENU DB</div>
-    <div class="cfg-sub">连接到你的 GitHub 私有数据库</div>
+    <div class="cfg-sub" data-i18n="cfgSub">连接到你的 GitHub 私有数据库</div>
 
     <div class="fg">
       <label class="fl">GitHub Personal Access Token</label>
       <input type="password" id="cfg-tok" class="fi" placeholder="ghp_xxxxxxxxxxxx">
-      <div class="fhint">需要 repo 权限 · 不会被存储到本地</div>
+      <div class="fhint" data-i18n="tokHint">需要 repo 权限 · 不会被存储到本地</div>
     </div>
     <div class="fg">
-      <label class="fl">仓库所有者（用户名）</label>
+      <label class="fl" data-i18n="lblOwner2">仓库所有者（用户名）</label>
       <input type="text" id="cfg-own" class="fi" placeholder="your-username">
     </div>
     <div class="fg">
-      <label class="fl">私有仓库名</label>
+      <label class="fl" data-i18n="lblRepo2">私有仓库名</label>
       <input type="text" id="cfg-rep" class="fi" placeholder="my-databases">
     </div>
     <div class="frow">
       <div class="fg">
-        <label class="fl">分支</label>
+        <label class="fl" data-i18n="lblBranch">分支</label>
         <input type="text" id="cfg-br" class="fi" value="main">
       </div>
       <div class="fg">
-        <label class="fl">文件路径</label>
+        <label class="fl" data-i18n="lblPath2">文件路径</label>
         <input type="text" id="cfg-pa" class="fi" value="menu.json">
       </div>
     </div>
 
-    <button class="btn btn-gold" onclick="doConnect()">连 接 →</button>
-    <button class="btn btn-ghost btn-w" onclick="doOffline()">离线使用（本地缓存）</button>
+    <button class="btn btn-gold" onclick="doConnect()" data-i18n="connectBtn2">连 接 →</button>
+    <button class="btn btn-ghost btn-w" onclick="doOffline()" data-i18n="offlineBtn">离线使用（本地缓存）</button>
   </div>
 </div>
 
@@ -372,24 +372,25 @@ body { font-family: 'Noto Serif SC', serif; background: var(--bg); color: var(--
   <header class="hdr">
     <div class="hdr-logo">MENU DB</div>
     <div class="hdr-sep"></div>
-    <input class="hdr-search" placeholder="搜索名称、描述、标签…" oninput="onSearch(this.value)">
+    <input class="hdr-search" data-i18n-ph="searchPh" placeholder="搜索名称、描述、标签…" oninput="onSearch(this.value)">
     <div class="hdr-right">
       <span class="save-st" id="save-st"></span>
-      <button class="btn btn-ghost btn-sm" id="btn-gh-save" onclick="ghSave()" style="display:none">↑ 保存至 GitHub</button>
-      <button class="btn btn-ghost btn-sm" id="btn-publish" onclick="publishPublic()" title="发布勾选了「公开展示」的菜品到个人网站数据">🌐 发布公开</button>
-      <button class="btn btn-ghost btn-sm" onclick="goSettings()">设置</button>
+      <button class="btn btn-ghost btn-sm" id="langBtn" onclick="toggleLang()">EN</button>
+      <button class="btn btn-ghost btn-sm" id="btn-gh-save" onclick="ghSave()" data-i18n="ghSaveBtn" style="display:none">↑ 保存至 GitHub</button>
+      <button class="btn btn-ghost btn-sm" id="btn-publish" onclick="publishPublic()" data-i18n="publishBtn" data-i18n-title="publishTitle" title="发布勾选了「公开展示」的菜品到个人网站数据">🌐 发布公开</button>
+      <button class="btn btn-ghost btn-sm" onclick="goSettings()" data-i18n="settingsBtn">设置</button>
     </div>
   </header>
 
   <!-- Sidebar -->
   <nav class="sidebar">
-    <div class="nav-sec-lbl">创 作 区</div>
-    <div class="nav-item" data-c="recipes"     onclick="setCat('recipes')">    <span class="nav-ico">🍳</span> 食谱 <span class="nav-ct" id="ct-recipes">0</span></div>
-    <div class="nav-item" data-c="cocktails"   onclick="setCat('cocktails')">  <span class="nav-ico">🍸</span> 调酒 <span class="nav-ct" id="ct-cocktails">0</span></div>
-    <div class="nav-item" data-c="baking"      onclick="setCat('baking')">     <span class="nav-ico">🥐</span> 烘焙 <span class="nav-ct" id="ct-baking">0</span></div>
-    <div class="nav-sec-lbl" style="margin-top:.5rem">素 材 库</div>
-    <div class="nav-item" data-c="ingredients" onclick="setCat('ingredients')"><span class="nav-ico">🥬</span> 食材 <span class="nav-ct" id="ct-ingredients">0</span></div>
-    <div class="nav-item" data-c="spirits"     onclick="setCat('spirits')">    <span class="nav-ico">🥃</span> 酒品 <span class="nav-ct" id="ct-spirits">0</span></div>
+    <div class="nav-sec-lbl" data-i18n="secCreate">创 作 区</div>
+    <div class="nav-item" data-c="recipes"     onclick="setCat('recipes')">    <span class="nav-ico">🍳</span> <span data-i18n="catRecipes">食谱</span> <span class="nav-ct" id="ct-recipes">0</span></div>
+    <div class="nav-item" data-c="cocktails"   onclick="setCat('cocktails')">  <span class="nav-ico">🍸</span> <span data-i18n="catCocktails">调酒</span> <span class="nav-ct" id="ct-cocktails">0</span></div>
+    <div class="nav-item" data-c="baking"      onclick="setCat('baking')">     <span class="nav-ico">🥐</span> <span data-i18n="catBaking">烘焙</span> <span class="nav-ct" id="ct-baking">0</span></div>
+    <div class="nav-sec-lbl" style="margin-top:.5rem" data-i18n="secMaterial">素 材 库</div>
+    <div class="nav-item" data-c="ingredients" onclick="setCat('ingredients')"><span class="nav-ico">🥬</span> <span data-i18n="catIngredients">食材</span> <span class="nav-ct" id="ct-ingredients">0</span></div>
+    <div class="nav-item" data-c="spirits"     onclick="setCat('spirits')">    <span class="nav-ico">🥃</span> <span data-i18n="catSpirits">酒品</span> <span class="nav-ct" id="ct-spirits">0</span></div>
   </nav>
 
   <!-- Content -->
@@ -405,8 +406,8 @@ body { font-family: 'Noto Serif SC', serif; background: var(--bg); color: var(--
     </div>
     <div id="modal-body"></div>
     <div class="modal-ftr">
-      <button class="btn btn-ghost btn-sm" onclick="closeModal()">取消</button>
-      <button class="btn btn-gold btn-sm" style="width:auto" onclick="saveItem()">保 存</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()" data-i18n="cancelBtn">取消</button>
+      <button class="btn btn-gold btn-sm" style="width:auto" onclick="saveItem()" data-i18n="saveBtn">保 存</button>
     </div>
   </div>
 </div>
@@ -425,22 +426,115 @@ body { font-family: 'Noto Serif SC', serif; background: var(--bg); color: var(--
 //  CONSTANTS
 // ═══════════════════════════════════════════
 const ZONES = [
-  { id:'all',      lbl:'全 部' },
-  { id:'external', lbl:'外部区', clr:'#6B8FA8' },
-  { id:'mastered', lbl:'掌握区', clr:'#5E8F6E' },
-  { id:'idea',     lbl:'想法区', clr:'#C9963A' },
-  { id:'success',  lbl:'成功区', clr:'#4E8F74' },
-  { id:'failure',  lbl:'失败区', clr:'#A86B5E' },
+  { id:'all',      lbl:'全 部', lblEn:'All' },
+  { id:'external', lbl:'外部区', lblEn:'External', clr:'#6B8FA8' },
+  { id:'mastered', lbl:'掌握区', lblEn:'Mastered', clr:'#5E8F6E' },
+  { id:'idea',     lbl:'想法区', lblEn:'Ideas', clr:'#C9963A' },
+  { id:'success',  lbl:'成功区', lblEn:'Success', clr:'#4E8F74' },
+  { id:'failure',  lbl:'失败区', lblEn:'Failure', clr:'#A86B5E' },
 ];
 const ZONE_MAP = Object.fromEntries(ZONES.slice(1).map(z=>[z.id,z]));
 
 const CATS = {
-  recipes:     { lbl:'食谱', ico:'🍳', zone:true,  acc:'#C4785A' },
-  cocktails:   { lbl:'调酒', ico:'🍸', zone:true,  acc:'#7A8EC4' },
-  baking:      { lbl:'烘焙', ico:'🥐', zone:true,  acc:'#C4A45A' },
-  ingredients: { lbl:'食材', ico:'🥬', zone:false, acc:'#5AC47A' },
-  spirits:     { lbl:'酒品', ico:'🥃', zone:false, acc:'#A45AC4' },
+  recipes:     { lbl:'食谱', lblEn:'Recipes',     ico:'🍳', zone:true,  acc:'#C4785A' },
+  cocktails:   { lbl:'调酒', lblEn:'Cocktails',   ico:'🍸', zone:true,  acc:'#7A8EC4' },
+  baking:      { lbl:'烘焙', lblEn:'Baking',      ico:'🥐', zone:true,  acc:'#C4A45A' },
+  ingredients: { lbl:'食材', lblEn:'Ingredients', ico:'🥬', zone:false, acc:'#5AC47A' },
+  spirits:     { lbl:'酒品', lblEn:'Spirits',     ico:'🥃', zone:false, acc:'#A45AC4' },
 };
+
+/* ── 中英双语（与导航站共享 pha-lang）；食材/酒品分类等存储枚举值不译 ── */
+let lang=(()=>{try{return localStorage.getItem("pha-lang")==="en"?"en":"zh"}catch(e){return "zh"}})();
+const clbl=o=>(lang==="en"&&o&&o.lblEn)?o.lblEn:(o?o.lbl:"");
+const I18N={
+  cfgSub:{zh:"连接到你的 GitHub 私有数据库",en:"Connect to your private GitHub database"},
+  tokHint:{zh:"需要 repo 权限 · 不会被存储到本地",en:"Needs repo scope · not stored locally"},
+  lblOwner2:{zh:"仓库所有者（用户名）",en:"Repo owner (username)"},
+  lblRepo2:{zh:"私有仓库名",en:"Private repo name"},
+  lblBranch:{zh:"分支",en:"Branch"},
+  lblPath2:{zh:"文件路径",en:"File path"},
+  connectBtn2:{zh:"连 接 →",en:"Connect →"},
+  offlineBtn:{zh:"离线使用（本地缓存）",en:"Use offline (local cache)"},
+  searchPh:{zh:"搜索名称、描述、标签…",en:"Search name, description, tags…"},
+  ghSaveBtn:{zh:"↑ 保存至 GitHub",en:"↑ Save to GitHub"},
+  publishBtn:{zh:"🌐 发布公开",en:"🌐 Publish"},
+  publishTitle:{zh:"发布勾选了「公开展示」的菜品到个人网站数据",en:"Publish items marked “public” to your site data"},
+  settingsBtn:{zh:"设置",en:"Settings"},
+  secCreate:{zh:"创 作 区",en:"CREATE"},
+  secMaterial:{zh:"素 材 库",en:"PANTRY"},
+  catRecipes:{zh:"食谱",en:"Recipes"},
+  catCocktails:{zh:"调酒",en:"Cocktails"},
+  catBaking:{zh:"烘焙",en:"Baking"},
+  catIngredients:{zh:"食材",en:"Ingredients"},
+  catSpirits:{zh:"酒品",en:"Spirits"},
+  cancelBtn:{zh:"取消",en:"Cancel"},
+  saveBtn:{zh:"保 存",en:"Save"},
+  add:{zh:"添加",en:"Add "},
+  edit2:{zh:"编辑",en:"Edit "},
+  addBtn:{zh:"＋ 添加",en:"+ Add"},
+  all:{zh:"全部",en:"All"},
+  noResults:{zh:"无搜索结果",en:"No results"},
+  noData:{zh:"暂无数据，点击「添加」开始记录",en:"No data yet — tap “Add” to start"},
+  steps:{zh:"步骤",en:"Steps"},
+  source:{zh:"来源",en:"Source"},
+  origin:{zh:"产地",en:"Origin"},
+  summary:{zh:"简介",en:"Summary"},
+  ingredients:{zh:"食材",en:"Ingredients"},
+  spiritsL:{zh:"酒品",en:"Spirits"},
+  notes:{zh:"备注",en:"Notes"},
+  tags:{zh:"标签",en:"Tags"},
+  usedIn:{zh:"使用于",en:"Used in"},
+  editBtn:{zh:"编辑",en:"Edit"},
+  delBtn:{zh:"删除",en:"Delete"},
+  name:{zh:"名称",en:"Name"},
+  category:{zh:"分类",en:"Category"},
+  type:{zh:"类型",en:"Type"},
+  abv:{zh:"酒精度 ABV%",en:"ABV %"},
+  zone:{zh:"区域",en:"Zone"},
+  publicLbl:{zh:"公开展示",en:"Public"},
+  publicHint:{zh:"勾选后「发布公开」会包含此条目",en:"When checked, “Publish” includes this item"},
+  description:{zh:"描述",en:"Description"},
+  linkIng:{zh:"关联食材",en:"Linked ingredients"},
+  linkSpi:{zh:"关联酒品",en:"Linked spirits"},
+  selectCat:{zh:"选择分类",en:"Select category"},
+  selectType:{zh:"选择类型",en:"Select type"},
+  selectZone:{zh:"选择区域",en:"Select zone"},
+  phName:{zh:"输入名称",en:"Enter name"},
+  phSource:{zh:"书名 / 网站 / 人名",en:"Book / site / person"},
+  phDesc:{zh:"简短描述…",en:"Short description…"},
+  phNotes:{zh:"补充说明…",en:"More notes…"},
+  phSearchIng:{zh:"搜索食材…",en:"Search ingredients…"},
+  phSearchSpi:{zh:"搜索酒品…",en:"Search spirits…"},
+  phTags:{zh:"输入后按 Enter 或逗号",en:"Type then Enter or comma"},
+  assocEmpty:{zh:"暂无数据，请先在素材库添加",en:"No items — add some in the Pantry first"},
+  addStep:{zh:"${L('addStep')}",en:"+ Add step"},
+  dataNotLoaded:{zh:"数据未加载",en:"Data not loaded"},
+  noPublic:{zh:"还没有勾选「公开展示」的条目",en:"No items marked “public” yet"},
+  publishFail:{zh:"发布失败：",en:"Publish failed: "},
+  fillCfg:{zh:"请填写 Token、用户名、仓库名",en:"Fill in Token, username, repo"},
+  connecting:{zh:"连接中…",en:"Connecting…"},
+  loaded:{zh:"加载成功 ✓",en:"Loaded ✓"},
+  fileCreated:{zh:"未找到文件，已创建空数据库",en:"File not found — empty database created"},
+  connFail:{zh:"连接失败：",en:"Connection failed: "},
+  connectFirst:{zh:"请先连接 GitHub",en:"Connect GitHub first"},
+  savedGh:{zh:"已保存至 GitHub ✓",en:"Saved to GitHub ✓"},
+  autoSyncFail:{zh:"自动同步失败：",en:"Auto-sync failed: "},
+  enterName:{zh:"请输入名称",en:"Enter a name"},
+  unsaved:{zh:"● 未保存",en:"● Unsaved"},
+  offlineMode:{zh:"离线模式",en:"Offline"},
+  synced:{zh:"已同步",en:"Synced"},
+  syncIn3s:{zh:"● 3s 后同步…",en:"● syncing in 3s…"},
+  syncing:{zh:"同步中…",en:"Syncing…"},
+};
+const L=k=>(I18N[k]||{zh:k,en:k})[lang];
+function applyStatic(){
+  document.querySelectorAll("[data-i18n]").forEach(el=>{const k=el.dataset.i18n;if(I18N[k])el.textContent=I18N[k][lang]});
+  document.querySelectorAll("[data-i18n-ph]").forEach(el=>{const k=el.dataset.i18nPh;if(I18N[k])el.placeholder=I18N[k][lang]});
+  document.querySelectorAll("[data-i18n-title]").forEach(el=>{const k=el.dataset.i18nTitle;if(I18N[k])el.title=I18N[k][lang]});
+  const lb=document.getElementById("langBtn");if(lb)lb.textContent=lang==="zh"?"EN":"中";
+  document.documentElement.lang=lang==="zh"?"zh-CN":"en";
+}
+function toggleLang(){lang=lang==="zh"?"en":"zh";try{localStorage.setItem("pha-lang",lang)}catch(e){}applyStatic();if(typeof renderAll==="function"&&S&&S.data){renderAll();closeDetail&&closeDetail();}}
 
 const ING_CATS   = ['蔬菜','肉类','海鲜','乳制品','谷物','调味料','坚果','水果','其他'];
 const SPI_TYPES  = ['威士忌','朗姆酒','金酒','伏特加','龙舌兰','白兰地','利口酒','葡萄酒','啤酒','清酒','中国白酒','其他'];
@@ -486,7 +580,7 @@ async function ghLoad(){
 }
 
 async function ghSave(){
-  if(!S.cfg?.token){ notify('请先连接 GitHub','err'); return; }
+  if(!S.cfg?.token){ notify(L('connectFirst'),'err'); return; }
   S.data.meta.last_updated = today();
   const content = btoa(unescape(encodeURIComponent(JSON.stringify(S.data,null,2))));
   const {owner,repo,branch,path} = S.cfg;
@@ -496,7 +590,7 @@ async function ghSave(){
   S.sha = res.content.sha;
   S.dirty = false;
   updSaveStatus();
-  notify('已保存至 GitHub ✓','ok');
+  notify(L('savedGh'),'ok');
 }
 
 // 公开数据：仅菜品类（食谱/调酒/烘焙）；配料只导出名称，notes 私人备注不出
@@ -520,10 +614,10 @@ function buildPublicData(){
 // 发布公开数据：直接写入 GitHub 数据仓库（与主数据同仓库，根目录）；
 // 未配置 GitHub 或发布失败时回退为本地下载
 async function publishPublic(){
-  if(!S.data){notify('数据未加载','err');return}
+  if(!S.data){notify(L('dataNotLoaded'),'err');return}
   const data=buildPublicData();
   const count=data.sections.reduce((n,s)=>n+s.items.length,0);
-  if(!count){notify('还没有勾选「公开展示」的条目','err');return}
+  if(!count){notify(L('noPublic'),'err');return}
   const filename='menu.public.json',json=JSON.stringify(data,null,2);
   if(S.cfg?.token){
     try{
@@ -535,14 +629,14 @@ async function publishPublic(){
       const body={message:`publish ${filename} (${count} entries)`,content:btoa(unescape(encodeURIComponent(json)))};
       if(sha)body.sha=sha;
       await ghApi(base,{method:'PUT',body:JSON.stringify(body)});
-      notify(`已发布 ${count} 条公开内容 → ${filename} ✓`,'ok');
+      notify(lang==="en"?`Published ${count} items → ${filename} ✓`:`已发布 ${count} 条公开内容 → ${filename} ✓`,'ok');
       return;
-    }catch(e){notify('发布失败：'+e.message+'，已转为本地下载','err')}
+    }catch(e){notify(L('publishFail')+e.message+(lang==="en"?" — saved locally instead":"，已转为本地下载"),'err')}
   }
   const blob=new Blob([json],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),2000);
-  notify(`已导出 ${count} 条公开内容（本地下载）`,'ok');
+  notify(lang==="en"?`Exported ${count} items (downloaded)`:`已导出 ${count} 条公开内容（本地下载）`,'ok');
 }
 
 // ═══════════════════════════════════════════
@@ -554,16 +648,16 @@ async function doConnect(){
   const repo   = document.getElementById('cfg-rep').value.trim();
   const branch = document.getElementById('cfg-br').value.trim()||'main';
   const path   = document.getElementById('cfg-pa').value.trim()||'menu.json';
-  if(!token||!owner||!repo){ notify('请填写 Token、用户名、仓库名','err'); return; }
+  if(!token||!owner||!repo){ notify(L('fillCfg'),'err'); return; }
   S.cfg = { token, owner, repo, branch, path };
   localStorage.setItem('menu_cfg', JSON.stringify({ token, owner, repo, branch, path }));
   try {
-    notify('连接中…','');
+    notify(L('connecting'),'');
     await ghLoad();
-    notify('加载成功 ✓','ok');
+    notify(L('loaded'),'ok');
   } catch(e){
-    if(e.message.startsWith('404')){ S.data=mkData(); S.sha=null; notify('未找到文件，已创建空数据库','ok'); }
-    else { notify('连接失败：'+e.message,'err'); return; }
+    if(e.message.startsWith('404')){ S.data=mkData(); S.sha=null; notify(L('fileCreated'),'ok'); }
+    else { notify(L('connFail')+e.message,'err'); return; }
   }
   showApp();
 }
@@ -608,7 +702,7 @@ function updActiveNav(){
 function updSaveStatus(){
   const el=document.getElementById('save-st');
   if(!el) return;
-  el.textContent = S.dirty ? '● 未保存' : (S.cfg?.offline ? '离线模式' : '已同步');
+  el.textContent = S.dirty ? L('unsaved') : (S.cfg?.offline ? L('offlineMode') : L('synced'));
   el.style.color  = S.dirty ? 'var(--idea)' : (S.cfg?.offline ? 'var(--text-dd)' : 'var(--suc)');
 }
 
@@ -619,12 +713,12 @@ function markDirty(){
   if(S.cfg?.token){
     clearTimeout(_syncTimer);
     const st=document.getElementById('save-st');
-    if(st){ st.textContent='● 3s 后同步…'; st.style.color='var(--idea)'; }
+    if(st){ st.textContent=L('syncIn3s'); st.style.color='var(--idea)'; }
     _syncTimer=setTimeout(async()=>{
       const st2=document.getElementById('save-st');
-      if(st2){ st2.textContent='同步中…'; st2.style.color='var(--text-d)'; }
+      if(st2){ st2.textContent=L('syncing'); st2.style.color='var(--text-d)'; }
       try{ await ghSave(); }
-      catch(e){ notify('自动同步失败：'+e.message,'err'); S.dirty=true; updSaveStatus(); }
+      catch(e){ notify(L('autoSyncFail')+e.message,'err'); S.dirty=true; updSaveStatus(); }
     },3000);
   } else { updSaveStatus(); }
 }
@@ -647,10 +741,10 @@ function renderContent(){
   let html = `<div class="ch">
     <div class="ch-left">
       <span style="font-size:1.4rem">${info.ico}</span>
-      <span class="ch-title">${info.lbl}</span>
-      <span class="ch-count">${filtered.length} 项</span>
+      <span class="ch-title">${clbl(info)}</span>
+      <span class="ch-count">${filtered.length}${lang==="en"?" items":" 项"}</span>
     </div>
-    <button class="btn btn-gold btn-sm" style="width:auto" onclick="openAdd()">＋ 添加</button>
+    <button class="btn btn-gold btn-sm" style="width:auto" onclick="openAdd()">${L('addBtn')}</button>
   </div>`;
 
   if(info.zone){
@@ -659,7 +753,7 @@ function renderContent(){
       const cnt = z.id==='all' ? items.length : items.filter(i=>i.zone===z.id).length;
       const ac  = S.ui.zone===z.id ? 'active' : '';
       const st  = (ac&&z.clr) ? `background:${z.clr};` : '';
-      html+=`<button class="ztab ${ac}" style="${st}" onclick="setZone('${z.id}')">${z.lbl} (${cnt})</button>`;
+      html+=`<button class="ztab ${ac}" style="${st}" onclick="setZone('${z.id}')">${clbl(z)} (${cnt})</button>`;
     });
     html+=`</div>`;
     if(S.ui.zone!=='all') filtered=filtered.filter(i=>i.zone===S.ui.zone);
@@ -668,7 +762,7 @@ function renderContent(){
     const uniq = [...new Set(items.map(i=>i[key]).filter(Boolean))];
     if(uniq.length){
       html+=`<div class="flt-row">
-        <button class="flt-btn ${S.ui.filter==='all'?'active':''}" onclick="setFilter('all')">全部</button>`;
+        <button class="flt-btn ${S.ui.filter==='all'?'active':''}" onclick="setFilter('all')">${L('all')}</button>`;
       uniq.forEach(v=>{ html+=`<button class="flt-btn ${S.ui.filter===v?'active':''}" onclick="setFilter('${esc(v)}')">${v}</button>`; });
       html+=`</div>`;
       if(S.ui.filter!=='all') filtered=filtered.filter(i=>i[key]===S.ui.filter);
@@ -676,7 +770,7 @@ function renderContent(){
   }
 
   if(!filtered.length){
-    html+=`<div class="empty"><div class="empty-ico">${info.ico}</div><div class="empty-txt">${q?'无搜索结果':'暂无数据，点击「添加」开始记录'}</div></div>`;
+    html+=`<div class="empty"><div class="empty-ico">${info.ico}</div><div class="empty-txt">${q?L('noResults'):L('noData')}</div></div>`;
   } else {
     html+=`<div class="card-grid">`;
     filtered.forEach(item=>{ html+=renderCard(item,cat,info); });
@@ -690,7 +784,7 @@ function renderCard(item,cat,info){
   const z   = item.zone ? ZONE_MAP[item.zone] : null;
   const barC = z ? z.clr : info.acc;
   let badge='';
-  if(z) badge=`<span class="card-zone" style="background:${z.clr}22;color:${z.clr}">${z.lbl}</span>`;
+  if(z) badge=`<span class="card-zone" style="background:${z.clr}22;color:${z.clr}">${clbl(z)}</span>`;
   if(cat==='ingredients'&&item.category) badge=`<span class="card-zone" style="background:var(--ing)22;color:var(--ing)">${item.category}</span>`;
   if(cat==='spirits'&&item.type) badge=`<span class="card-zone" style="background:var(--spi)22;color:var(--spi)">${item.type}${item.abv?` ${item.abv}%`:''}</span>`;
 
@@ -699,7 +793,7 @@ function renderCard(item,cat,info){
   const feet=[];
   if(ingN) feet.push(`🥬 ${ingN}`);
   if(spiN) feet.push(`🥃 ${spiN}`);
-  if((item.steps||[]).length) feet.push(`📋 ${item.steps.length} 步`);
+  if((item.steps||[]).length) feet.push(`📋 ${item.steps.length}${lang==="en"?" steps":" 步"}`);
 
   const tags=(item.tags||[]).slice(0,4).map(t=>`<span class="card-tag">${t}</span>`).join('');
 
@@ -710,7 +804,7 @@ function renderCard(item,cat,info){
     ${item.description?`<div class="card-desc">${esc(item.description)}</div>`:''}
     ${tags?`<div class="card-tags">${tags}</div>`:''}
     ${feet.length?`<div class="card-foot">${feet.join(' · ')}</div>`:''}
-    ${item.source?`<div class="card-src">来源：${esc(item.source)}</div>`:''}
+    ${item.source?`<div class="card-src">${L('source')}：${esc(item.source)}</div>`:''}
   </div>`;
 }
 
@@ -725,36 +819,36 @@ function showDetail(id,cat){
   let h='';
 
   // Badge
-  if(z) h+=`<span class="card-zone" style="background:${z.clr}22;color:${z.clr}">${z.lbl}</span>`;
+  if(z) h+=`<span class="card-zone" style="background:${z.clr}22;color:${z.clr}">${clbl(z)}</span>`;
   if(cat==='ingredients'&&item.category) h+=`<span class="card-zone" style="background:var(--ing)22;color:var(--ing)">${item.category}</span>`;
   if(cat==='spirits'&&item.type) h+=`<span class="card-zone" style="background:var(--spi)22;color:var(--spi)">${item.type}${item.abv?' · '+item.abv+'%':''}</span>`;
 
   h+=`<div class="d-name">${esc(item.name)}</div>`;
-  if(item.source) h+=`<div class="d-src">来源：${esc(item.source)}</div>`;
-  if(item.origin) h+=`<div class="d-src">产地：${esc(item.origin)}</div>`;
-  if(item.description) h+=`<div class="d-sec"><div class="d-sec-lbl">简介</div><div class="d-text">${esc(item.description)}</div></div>`;
+  if(item.source) h+=`<div class="d-src">${L('source')}：${esc(item.source)}</div>`;
+  if(item.origin) h+=`<div class="d-src">${L('origin')}：${esc(item.origin)}</div>`;
+  if(item.description) h+=`<div class="d-sec"><div class="d-sec-lbl">${L('summary')}</div><div class="d-text">${esc(item.description)}</div></div>`;
 
   if((item.ingredient_ids||[]).length){
     const chips=item.ingredient_ids.map(id=>{
       const ing=S.data.ingredients.find(i=>i.id===id);
       return ing?`<span class="linked-chip" onclick="jumpTo('${id}','ingredients')">${esc(ing.name)}</span>`:'';
     }).join('');
-    h+=`<div class="d-sec"><div class="d-sec-lbl">食材</div><div class="linked-chips">${chips}</div></div>`;
+    h+=`<div class="d-sec"><div class="d-sec-lbl">${L('ingredients')}</div><div class="linked-chips">${chips}</div></div>`;
   }
   if((item.spirit_ids||[]).length){
     const chips=item.spirit_ids.map(id=>{
       const spi=S.data.spirits.find(i=>i.id===id);
       return spi?`<span class="linked-chip" onclick="jumpTo('${id}','spirits')">${esc(spi.name)}</span>`:'';
     }).join('');
-    h+=`<div class="d-sec"><div class="d-sec-lbl">酒品</div><div class="linked-chips">${chips}</div></div>`;
+    h+=`<div class="d-sec"><div class="d-sec-lbl">${L('spiritsL')}</div><div class="linked-chips">${chips}</div></div>`;
   }
   if((item.steps||[]).length){
-    h+=`<div class="d-sec"><div class="d-sec-lbl">步骤</div><ol class="steps-ol">`;
+    h+=`<div class="d-sec"><div class="d-sec-lbl">${L('steps')}</div><ol class="steps-ol">`;
     item.steps.forEach(s=>{ h+=`<li>${esc(s)}</li>`; });
     h+=`</ol></div>`;
   }
-  if(item.notes) h+=`<div class="d-sec"><div class="d-sec-lbl">备注</div><div class="d-text">${esc(item.notes)}</div></div>`;
-  if((item.tags||[]).length) h+=`<div class="d-sec"><div class="d-sec-lbl">标签</div><div class="card-tags">${item.tags.map(t=>`<span class="card-tag">${esc(t)}</span>`).join('')}</div></div>`;
+  if(item.notes) h+=`<div class="d-sec"><div class="d-sec-lbl">${L('notes')}</div><div class="d-text">${esc(item.notes)}</div></div>`;
+  if((item.tags||[]).length) h+=`<div class="d-sec"><div class="d-sec-lbl">${L('tags')}</div><div class="card-tags">${item.tags.map(t=>`<span class="card-tag">${esc(t)}</span>`).join('')}</div></div>`;
 
   // Used in
   if(!info.zone){
@@ -763,13 +857,13 @@ function showDetail(id,cat){
     ['recipes','cocktails','baking'].forEach(c=>{ (S.data[c]||[]).forEach(it=>{ if((it[key]||[]).includes(id)) used.push({c,it}); }); });
     if(used.length){
       const chips=used.map(({c,it})=>`<span class="linked-chip" onclick="jumpTo('${it.id}','${c}')">${CATS[c].ico} ${esc(it.name)}</span>`).join('');
-      h+=`<div class="d-sec"><div class="d-sec-lbl">使用于</div><div class="linked-chips">${chips}</div></div>`;
+      h+=`<div class="d-sec"><div class="d-sec-lbl">${L('usedIn')}</div><div class="linked-chips">${chips}</div></div>`;
     }
   }
 
   h+=`<div class="d-acts">
-    <button class="btn btn-ghost btn-sm" onclick="openEdit('${id}','${cat}')">编辑</button>
-    <button class="btn btn-danger btn-sm" onclick="delItem('${id}','${cat}')">删除</button>
+    <button class="btn btn-ghost btn-sm" onclick="openEdit('${id}','${cat}')">${L('editBtn')}</button>
+    <button class="btn btn-danger btn-sm" onclick="delItem('${id}','${cat}')">${L('delBtn')}</button>
   </div>`;
 
   document.getElementById('detail-body').innerHTML=h;
@@ -789,7 +883,7 @@ function jumpTo(id,cat){
 function openAdd(){
   S.editing=null;
   S.tmp={ tags:[], ing:[], spi:[], steps:[] };
-  document.getElementById('modal-ttl').textContent=`添加${CATS[S.ui.cat].lbl}`;
+  document.getElementById('modal-ttl').textContent=`${L('add')}${clbl(CATS[S.ui.cat])}`;
   document.getElementById('modal-body').innerHTML=buildForm(S.ui.cat,null);
   document.getElementById('modal-bg').classList.add('open');
 }
@@ -799,7 +893,7 @@ function openEdit(id,cat){
   if(!item) return;
   S.editing={id,cat};
   S.tmp={ tags:[...(item.tags||[])], ing:[...(item.ingredient_ids||[])], spi:[...(item.spirit_ids||[])], steps:[...(item.steps||[])] };
-  document.getElementById('modal-ttl').textContent=`编辑${CATS[cat].lbl}`;
+  document.getElementById('modal-ttl').textContent=`${L('edit2')}${clbl(CATS[cat])}`;
   document.getElementById('modal-body').innerHTML=buildForm(cat,item);
   document.getElementById('modal-bg').classList.add('open');
 }
@@ -812,33 +906,33 @@ function field(lbl,inner){ return `<div class="fg"><label class="fl">${lbl}</lab
 function buildForm(cat,v){
   const d=v||{};
   let h='';
-  h+=field('名称',`<input class="fi" id="f-name" value="${esc(d.name||'')}" placeholder="输入名称">`);
+  h+=field(L('name'),`<input class="fi" id="f-name" value="${esc(d.name||'')}" placeholder="${L('phName')}">`);
 
   if(cat==='ingredients'){
-    h+=field('分类',`<select class="fs" id="f-cat"><option value="">选择分类</option>${ING_CATS.map(c=>`<option value="${c}"${d.category===c?' selected':''}>${c}</option>`).join('')}</select>`);
+    h+=field(L('category'),`<select class="fs" id="f-cat"><option value="">${L('selectCat')}</option>${ING_CATS.map(c=>`<option value="${c}"${d.category===c?' selected':''}>${c}</option>`).join('')}</select>`);
   } else if(cat==='spirits'){
-    h+=field('类型',`<select class="fs" id="f-type"><option value="">选择类型</option>${SPI_TYPES.map(t=>`<option value="${t}"${d.type===t?' selected':''}>${t}</option>`).join('')}</select>`);
+    h+=field(L('type'),`<select class="fs" id="f-type"><option value="">${L('selectType')}</option>${SPI_TYPES.map(t=>`<option value="${t}"${d.type===t?' selected':''}>${t}</option>`).join('')}</select>`);
     h+=`<div class="frow2">`;
-    h+=field('产地',`<input class="fi" id="f-origin" value="${esc(d.origin||'')}">`);
-    h+=field('酒精度 ABV%',`<input class="fi" id="f-abv" type="number" min="0" max="100" step="0.1" value="${d.abv||''}">`);
+    h+=field(L('origin'),`<input class="fi" id="f-origin" value="${esc(d.origin||'')}">`);
+    h+=field(L('abv'),`<input class="fi" id="f-abv" type="number" min="0" max="100" step="0.1" value="${d.abv||''}">`);
     h+=`</div>`;
   } else {
-    h+=field('区域',`<select class="fs" id="f-zone" onchange="onZoneChange()"><option value="">选择区域</option>${ZONES.slice(1).map(z=>`<option value="${z.id}"${d.zone===z.id?' selected':''}>${z.lbl}</option>`).join('')}</select>`);
+    h+=field(L('zone'),`<select class="fs" id="f-zone" onchange="onZoneChange()"><option value="">${L('selectZone')}</option>${ZONES.slice(1).map(z=>`<option value="${z.id}"${d.zone===z.id?' selected':''}>${clbl(z)}</option>`).join('')}</select>`);
     const showSrc=d.zone==='external'||d.zone==='mastered';
-    h+=`<div id="src-wrap"${showSrc?'':' style="display:none"'}>`+field('来源',`<input class="fi" id="f-src" value="${esc(d.source||'')}" placeholder="书名 / 网站 / 人名">`)+`</div>`;
-    h+=field('公开展示',`<label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="f-public"${d.public?' checked':''}> 勾选后「发布公开」会包含此条目</label>`);
+    h+=`<div id="src-wrap"${showSrc?'':' style="display:none"'}>`+field(L('source'),`<input class="fi" id="f-src" value="${esc(d.source||'')}" placeholder="${L('phSource')}">`)+`</div>`;
+    h+=field(L('publicLbl'),`<label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="f-public"${d.public?' checked':''}> ${L('publicHint')}</label>`);
   }
 
-  h+=field('描述',`<textarea class="fi fta" id="f-desc" placeholder="简短描述…">${esc(d.description||'')}</textarea>`);
+  h+=field(L('description'),`<textarea class="fi fta" id="f-desc" placeholder="${L('phDesc')}">${esc(d.description||'')}</textarea>`);
 
   if(cat!=='ingredients'&&cat!=='spirits'){
-    h+=field('关联食材', buildAssoc('ing', S.data.ingredients, S.tmp.ing, '搜索食材…'));
-    h+=field('关联酒品',  buildAssoc('spi', S.data.spirits,      S.tmp.spi, '搜索酒品…'));
-    h+=field('步骤',      buildStepsUI());
+    h+=field(L('linkIng'), buildAssoc('ing', S.data.ingredients, S.tmp.ing, L('phSearchIng')));
+    h+=field(L('linkSpi'),  buildAssoc('spi', S.data.spirits,      S.tmp.spi, L('phSearchSpi')));
+    h+=field(L('steps'),      buildStepsUI());
   }
 
-  h+=field('备注',`<textarea class="fi fta" id="f-notes" placeholder="补充说明…">${esc(d.notes||'')}</textarea>`);
-  h+=field('标签', buildTagsUI());
+  h+=field(L('notes'),`<textarea class="fi fta" id="f-notes" placeholder="${L('phNotes')}">${esc(d.notes||'')}</textarea>`);
+  h+=field(L('tags'), buildTagsUI());
   return h;
 }
 
@@ -850,7 +944,7 @@ function onZoneChange(){
 
 // ── Association picker (scrollable list with toggle) ──
 function buildAssoc(type, all, sel, ph){
-  const empty=`<div style="padding:.6rem .75rem;font-size:.78rem;color:var(--text-dd)">暂无数据，请先在素材库添加</div>`;
+  const empty=`<div style="padding:.6rem .75rem;font-size:.78rem;color:var(--text-dd)">${L('assocEmpty')}</div>`;
   const rows=all.map(it=>{
     const on=sel.includes(it.id)?'on':'';
     const sub=it.category||it.type||'';
@@ -863,7 +957,7 @@ function buildAssoc(type, all, sel, ph){
   return `<div class="assoc-wrap">
     <input class="assoc-search" placeholder="${ph}" oninput="filterAssoc('${type}',this.value)">
     <div class="assoc-list" id="${type}-list">${all.length?rows:empty}</div>
-    <div class="assoc-foot">已选 <span id="${type}-ct">${sel.length}</span> 项</div>
+    <div class="assoc-foot">${lang==="en"?"":"已选 "}<span id="${type}-ct">${sel.length}</span>${lang==="en"?" selected":" 项"}</div>
   </div>`;
 }
 
@@ -888,7 +982,7 @@ function filterAssoc(type,val){
 // ── Steps ──
 function buildStepsUI(){
   return `<div id="steps-list">${renderStepRows()}</div>
-    <button class="btn btn-ghost btn-sm" style="margin-top:.35rem" onclick="addStep()">＋ 添加步骤</button>`;
+    <button class="btn btn-ghost btn-sm" style="margin-top:.35rem" onclick="addStep()">${L('addStep')}</button>`;
 }
 
 function renderStepRows(){
@@ -908,7 +1002,7 @@ function buildTagsUI(){
   const chips=S.tmp.tags.map(t=>`<span class="chip">${esc(t)}<span class="chip-x" onclick="rmTag('${esc(t)}')">×</span></span>`).join('');
   return `<div class="chips-box" id="tags-box" onclick="document.getElementById('tags-inp').focus()">
     ${chips}
-    <input class="tags-inp" id="tags-inp" placeholder="输入后按 Enter 或逗号" onkeydown="onTagKey(event)">
+    <input class="tags-inp" id="tags-inp" placeholder="${L('phTags')}" onkeydown="onTagKey(event)">
   </div>`;
 }
 
@@ -937,7 +1031,7 @@ function rmTag(t){
 function saveItem(){
   const cat=S.editing?S.editing.cat:S.ui.cat;
   const name=document.getElementById('f-name')?.value.trim();
-  if(!name){ notify('请输入名称','err'); return; }
+  if(!name){ notify(L('enterName'),'err'); return; }
 
   const item={
     id:         S.editing ? S.editing.id : uid(),
@@ -973,16 +1067,16 @@ function saveItem(){
   }
 
   markDirty(); closeModal(); renderAll();
-  notify(`已${S.editing?'更新':'添加'}「${name}」`,'ok');
+  notify(lang==="en"?`${S.editing?'Updated':'Added'} “${name}”`:`已${S.editing?'更新':'添加'}「${name}」`,'ok');
   setTimeout(()=>showDetail(item.id,cat),80);
 }
 
 function delItem(id,cat){
   const it=S.data[cat].find(i=>i.id===id);
-  if(!it||!confirm(`确认删除「${it.name}」？`)) return;
+  if(!it||!confirm(lang==="en"?`Delete “${it.name}”?`:`确认删除「${it.name}」？`)) return;
   S.data[cat]=S.data[cat].filter(i=>i.id!==id);
   markDirty(); closeDetail(); renderAll();
-  notify(`已删除「${it.name}」`,'');
+  notify(lang==="en"?`Deleted “${it.name}”`:`已删除「${it.name}」`,'');
 }
 
 // ═══════════════════════════════════════════
@@ -999,6 +1093,7 @@ function notify(msg,type=''){
 //  INIT
 // ═══════════════════════════════════════════
 // Restore config & auto-reconnect on refresh
+applyStatic();
 (async()=>{
   try {
     const c=JSON.parse(localStorage.getItem('menu_cfg')||'{}');
