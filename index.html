@@ -1,0 +1,1800 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>菜单数据库</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Noto+Serif+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:         #0C0A08;
+  --surface:    #141210;
+  --card:       #1C1714;
+  --card-h:     #231E18;
+  --border:     #2A231C;
+  --border-l:   #382E24;
+  --text:       #EDE8DF;
+  --text-d:     #8A7F70;
+  --text-dd:    #453C32;
+  --gold:       #C9963A;
+  --gold-l:     #DFB05A;
+
+  --ext:    #6B8FA8;
+  --mas:    #5E8F6E;
+  --idea:   #C9963A;
+  --suc:    #4E8F74;
+  --fail:   #A86B5E;
+
+  --rec:   #C4785A;
+  --coc:   #7A8EC4;
+  --bak:   #C4A45A;
+  --ing:   #5AC47A;
+  --spi:   #A45AC4;
+  --fam:   #C46A8E;
+}
+
+html, body { height: 100%; overflow: hidden; }
+body { font-family: 'Noto Serif SC', serif; background: var(--bg); color: var(--text); }
+
+/* ── Settings ── */
+.screen-settings {
+  display: flex; align-items: center; justify-content: center;
+  height: 100vh;
+  background: radial-gradient(ellipse at 40% 30%, #1E1610 0%, #0C0A08 65%);
+}
+.cfg-card {
+  background: var(--card); border: 1px solid var(--border-l);
+  border-radius: 3px; padding: 2.5rem 2.75rem; width: 100%; max-width: 460px;
+}
+.cfg-logo {
+  font-family: 'Cormorant Garamond', serif; font-size: 2.2rem;
+  font-weight: 300; letter-spacing: .18em; color: var(--gold);
+  text-align: center; margin-bottom: .25rem;
+}
+.cfg-sub {
+  text-align: center; color: var(--text-d); font-size: .8rem;
+  letter-spacing: .08em; margin-bottom: 2rem;
+}
+.frow { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+.fg { margin-bottom: 1rem; }
+.fl {
+  display: block; font-size: .68rem; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--text-d); margin-bottom: .4rem;
+}
+.fi, .fs, .fta {
+  width: 100%; background: var(--surface); border: 1px solid var(--border-l);
+  border-radius: 2px; padding: .65rem .9rem; color: var(--text);
+  font-family: 'Noto Serif SC', serif; font-size: .88rem; outline: none;
+  transition: border-color .2s;
+}
+.fi:focus, .fs:focus, .fta:focus { border-color: var(--gold); }
+.fhint { font-size: .7rem; color: var(--text-dd); margin-top: .3rem; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: .4rem; padding: .65rem 1.25rem; border: none; border-radius: 2px;
+  cursor: pointer; font-family: 'Noto Serif SC', serif;
+  font-size: .85rem; letter-spacing: .06em; transition: all .18s;
+}
+.btn-gold { background: var(--gold); color: #0C0A08; width: 100%; margin-top: .25rem; }
+.btn-gold:hover { background: var(--gold-l); }
+.btn-ghost {
+  background: transparent; color: var(--text-d);
+  border: 1px solid var(--border-l);
+}
+.btn-ghost:hover { color: var(--text); border-color: var(--text-d); }
+.btn-w { width: 100%; margin-top: .4rem; }
+.btn-sm { padding: .4rem .75rem; font-size: .78rem; }
+.btn-danger { background: transparent; color: var(--fail); border: 1px solid var(--fail); }
+.btn-danger:hover { background: var(--fail); color: var(--text); }
+
+/* ── App layout ── */
+.app {
+  display: grid;
+  grid-template-columns: 196px 1fr;
+  grid-template-rows: 52px 1fr;
+  height: 100vh; display: none;
+}
+
+/* Header */
+.hdr {
+  grid-column: 1 / -1; background: var(--surface);
+  border-bottom: 1px solid var(--border); display: flex;
+  align-items: center; padding: 0 1.25rem; gap: 1rem;
+}
+.hdr-logo {
+  font-family: 'Cormorant Garamond', serif; font-size: 1.15rem;
+  font-weight: 300; color: var(--gold); letter-spacing: .2em; white-space: nowrap;
+}
+.hdr-sep { width: 1px; height: 20px; background: var(--border-l); }
+.hdr-search {
+  flex: 1; max-width: 360px; background: var(--card);
+  border: 1px solid var(--border); border-radius: 2px;
+  padding: .38rem .8rem; color: var(--text);
+  font-family: 'Noto Serif SC', serif; font-size: .83rem; outline: none;
+}
+.hdr-search:focus { border-color: var(--gold); }
+.hdr-search::placeholder { color: var(--text-dd); }
+.hdr-right { margin-left: auto; display: flex; align-items: center; gap: .75rem; }
+.save-st { font-size: .72rem; }
+
+/* Sidebar */
+.sidebar {
+  background: var(--surface); border-right: 1px solid var(--border);
+  padding: .75rem 0; overflow-y: auto;
+}
+.nav-sec-lbl {
+  font-size: .62rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--text-dd); padding: .5rem 1.1rem .3rem;
+}
+.nav-item {
+  display: flex; align-items: center; gap: .65rem;
+  padding: .58rem 1.1rem; cursor: pointer;
+  border-left: 2px solid transparent; color: var(--text-d);
+  font-size: .88rem; transition: all .14s;
+}
+.nav-item:hover { color: var(--text); background: var(--card); }
+.nav-item.active { color: var(--gold); border-left-color: var(--gold); background: rgba(201,150,58,.07); }
+.nav-ico { font-size: .95rem; width: 1.1rem; text-align: center; }
+.nav-ct {
+  margin-left: auto; font-size: .68rem; color: var(--text-dd);
+  background: var(--card); padding: .1rem .4rem; border-radius: 20px;
+}
+
+/* Main content */
+.content { overflow-y: auto; padding: 1.5rem; }
+
+/* Content header */
+.ch { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+.ch-left { display: flex; align-items: baseline; gap: .6rem; }
+.ch-title { font-family: 'Cormorant Garamond', serif; font-size: 1.7rem; font-weight: 300; }
+.ch-count { font-size: .78rem; color: var(--text-dd); }
+
+/* Zone tabs */
+.ztabs { display: flex; gap: .4rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+.ztab {
+  padding: .32rem .85rem; border-radius: 1px; font-size: .74rem;
+  letter-spacing: .07em; cursor: pointer; border: 1px solid var(--border-l);
+  color: var(--text-d); background: transparent; transition: all .14s;
+  font-family: 'Noto Serif SC', serif;
+}
+.ztab:hover { color: var(--text); }
+.ztab.active { color: #0C0A08; border-color: transparent; }
+
+/* Filter chips */
+.flt-row { display: flex; gap: .4rem; margin-bottom: 1.25rem; flex-wrap: wrap; align-items: center; }
+.flt-lbl { color: var(--text-d); font-size: .78rem; margin-right: .1rem; }
+.flt-btn {
+  padding: .28rem .7rem; font-size: .74rem; background: transparent;
+  border: 1px solid var(--border-l); border-radius: 1px; color: var(--text-d);
+  cursor: pointer; font-family: 'Noto Serif SC', serif; transition: all .14s;
+}
+.flt-btn:hover { color: var(--text); }
+.flt-btn.active { background: var(--gold); color: #0C0A08; border-color: var(--gold); }
+
+/* Cards */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: .9rem; }
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 2px; padding: 1.1rem; cursor: pointer;
+  transition: all .18s; position: relative; overflow: hidden;
+}
+.card:hover { background: var(--card-h); border-color: var(--border-l); transform: translateY(-1px); }
+.card-bar { position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+/* ── 家人菜谱 ── */
+.fam-bar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;padding:.7rem .9rem;margin:0 0 .8rem;
+  border:1px solid var(--line);border-radius:10px;color:var(--text-d);font-size:.9rem;background:var(--bg-2,transparent)}
+.fam-bar-new{border-color:var(--fam);color:var(--fam);font-weight:600}
+.fam-bar-err{border-color:#A86B5E;color:#A86B5E}
+.fam-sub{border:1px solid var(--line);border-left:3px solid var(--fam);border-radius:10px;padding:.8rem .9rem;margin:0 0 .7rem}
+.fam-sub-hd{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.4rem}
+.fam-sub-at{color:var(--text-d);font-size:.8rem;margin-left:auto}
+.fam-sub-body{font-size:.9rem;line-height:1.65;white-space:pre-wrap;margin:.3rem 0 .6rem}
+.fam-sub-acts{display:flex;gap:.4rem}
+/* 这个 app 的 .btn 默认 width:100%（表单里用的），横排时必须收回来 */
+.fam-sub-acts .btn,.fam-iv-acts .btn,.fam-bar .btn{width:auto;flex:0 0 auto}
+.fam-phs{display:flex;flex-wrap:wrap;gap:.45rem;margin:.4rem 0}
+.fam-ph{display:block;width:4.5rem;height:4.5rem;border-radius:8px;overflow:hidden;border:1px solid var(--line);background:var(--line)}
+.fam-ph img{width:100%;height:100%;object-fit:cover;display:block}
+.fam-ph-big{width:8rem;height:8rem}
+.fam-ph-card{width:100%;height:7rem;margin:.5rem 0 0}
+.fam-ph-bad{opacity:.35}
+.fam-new{display:inline-block;margin-left:.4rem;padding:.05rem .4rem;border-radius:6px;font-size:.7rem;
+  background:var(--fam);color:#fff;vertical-align:middle}
+.fam-raw{border-top:1px dashed var(--line);padding-top:.7rem}
+.fam-raw .d-text{white-space:pre-wrap;color:var(--text-d)}
+.fam-note{color:var(--text-d);font-size:.82rem;line-height:1.6;margin-top:.8rem}
+.fam-iv-list{margin-top:1rem;display:flex;flex-direction:column;gap:.6rem}
+.fam-iv{border:1px solid var(--line);border-radius:10px;padding:.7rem .8rem}
+.fam-iv-off{opacity:.5}
+.fam-iv-hd{display:flex;align-items:center;gap:.5rem}
+.fam-iv-rel{color:var(--text-d);font-size:.82rem}
+.fam-iv-tag{margin-left:auto;font-size:.72rem;padding:.05rem .4rem;border-radius:6px;background:var(--line)}
+.fam-iv-link{font-family:ui-monospace,Menlo,monospace;font-size:.74rem;word-break:break-all;color:var(--text-d);
+  margin:.35rem 0 .5rem;cursor:pointer}
+.fam-iv-acts{display:flex;gap:.4rem}
+.card-zone {
+  font-size: .62rem; letter-spacing: .1em; text-transform: uppercase;
+  padding: .18rem .55rem; border-radius: 20px; display: inline-block; margin-bottom: .65rem;
+}
+.card-name { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 400; margin-bottom: .3rem; line-height: 1.3; }
+.card-desc { font-size: .78rem; color: var(--text-d); line-height: 1.55; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card-tags { display: flex; gap: .35rem; margin-top: .6rem; flex-wrap: wrap; }
+.card-tag { font-size: .62rem; padding: .12rem .45rem; background: var(--border); border-radius: 20px; color: var(--text-d); }
+.card-foot { display: flex; gap: .5rem; margin-top: .5rem; font-size: .7rem; color: var(--text-dd); }
+.card-src { font-size: .68rem; color: var(--text-dd); margin-top: .3rem; font-style: italic; }
+
+/* Empty */
+.empty { text-align: center; padding: 4rem 2rem; color: var(--text-dd); }
+.empty-ico { font-size: 2.5rem; margin-bottom: .75rem; }
+.empty-txt { font-size: .85rem; }
+
+/* ── Modal ── */
+.modal-bg {
+  position: fixed; inset: 0; background: rgba(0,0,0,.8);
+  display: none; align-items: center; justify-content: center; z-index: 100; padding: 1.5rem;
+}
+.modal-bg.open { display: flex; }
+.modal {
+  background: var(--card); border: 1px solid var(--border-l);
+  border-radius: 3px; width: 100%; max-width: 580px;
+  max-height: 88vh; overflow-y: auto; padding: 1.75rem;
+}
+.modal-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+.modal-title { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 400; color: var(--gold); }
+.modal-x { background: none; border: none; color: var(--text-d); cursor: pointer; font-size: 1.1rem; padding: .25rem; }
+.modal-ftr { display: flex; justify-content: flex-end; gap: .6rem; margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid var(--border); }
+
+/* Form */
+.fta { resize: vertical; min-height: 72px; }
+.frow2 { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+
+/* Chips */
+.chips-box {
+  display: flex; flex-wrap: wrap; gap: .35rem; align-items: center;
+  padding: .45rem; background: var(--surface); border: 1px solid var(--border-l);
+  border-radius: 2px; min-height: 44px; cursor: text;
+}
+.chips-box:focus-within { border-color: var(--gold); }
+.chip {
+  display: inline-flex; align-items: center; gap: .25rem;
+  padding: .18rem .55rem; background: var(--border-l); border-radius: 20px;
+  font-size: .76rem; color: var(--text);
+}
+.chip-x { cursor: pointer; color: var(--text-d); line-height: 1; font-size: .85rem; }
+.chip-x:hover { color: var(--fail); }
+.tags-inp { background: none; border: none; outline: none; color: var(--text); font-family: 'Noto Serif SC', serif; font-size: .84rem; min-width: 70px; flex: 1; }
+
+/* Assoc list picker */
+.assoc-wrap { background: var(--surface); border: 1px solid var(--border-l); border-radius: 2px; overflow: hidden; }
+.assoc-search {
+  width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--border);
+  padding: .5rem .75rem; color: var(--text); font-family: 'Noto Serif SC', serif;
+  font-size: .82rem; outline: none;
+}
+.assoc-search::placeholder { color: var(--text-dd); }
+.assoc-list { max-height: 150px; overflow-y: auto; }
+.assoc-item {
+  display: flex; align-items: center; padding: .42rem .75rem;
+  cursor: pointer; font-size: .83rem; color: var(--text-d);
+  transition: background .1s; gap: .5rem; border-bottom: 1px solid var(--border);
+}
+.assoc-item:last-child { border-bottom: none; }
+.assoc-item:hover { background: var(--card); color: var(--text); }
+.assoc-item.on { color: var(--gold); background: rgba(201,150,58,.07); }
+.assoc-item.on .assoc-chk { opacity:1; }
+.assoc-chk { margin-left:auto; opacity:0; color:var(--gold); font-size:.8rem; transition:opacity .1s; }
+.assoc-sub { font-size:.68rem; color:var(--text-dd); }
+.assoc-foot { font-size:.7rem; color:var(--text-dd); padding:.3rem .75rem; }
+
+/* Steps */
+.step-row { display: flex; gap: .5rem; margin-bottom: .45rem; align-items: center; }
+.step-num { color: var(--gold); font-family: 'Cormorant Garamond', serif; width: 1.1rem; text-align: center; flex-shrink: 0; }
+
+/* ── Detail Panel ── */
+.detail {
+  position: fixed; right: 0; top: 52px; bottom: 0; width: 400px;
+  background: var(--surface); border-left: 1px solid var(--border);
+  transform: translateX(100%); transition: transform .28s ease;
+  z-index: 50; overflow-y: auto; padding: 1.5rem;
+}
+.detail.open { transform: translateX(0); }
+.detail-x { position: absolute; top: .9rem; right: .9rem; background: none; border: none; color: var(--text-d); cursor: pointer; font-size: 1.1rem; }
+.d-name { font-family: 'Cormorant Garamond', serif; font-size: 1.85rem; font-weight: 300; line-height: 1.2; margin: .75rem 0 .5rem; }
+.d-src { font-size: .78rem; color: var(--text-d); font-style: italic; margin-bottom: .75rem; }
+.d-sec { margin-top: 1.1rem; padding-top: 1.1rem; border-top: 1px solid var(--border); }
+.d-sec-lbl { font-size: .62rem; letter-spacing: .15em; text-transform: uppercase; color: var(--text-dd); margin-bottom: .6rem; }
+.d-text { font-size: .86rem; color: var(--text-d); line-height: 1.7; }
+.steps-ol { list-style: none; counter-reset: s; }
+.steps-ol li { counter-increment: s; display: flex; gap: .65rem; margin-bottom: .65rem; font-size: .85rem; color: var(--text-d); line-height: 1.6; }
+.steps-ol li::before {
+  content: counter(s); background: var(--card); color: var(--gold);
+  min-width: 1.4rem; height: 1.4rem; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .72rem; font-family: 'Cormorant Garamond', serif; flex-shrink: 0; margin-top: .1rem;
+}
+.linked-chips { display: flex; flex-wrap: wrap; gap: .35rem; }
+.linked-chip {
+  padding: .22rem .6rem; background: var(--card); border: 1px solid var(--border-l);
+  border-radius: 20px; font-size: .75rem; color: var(--text-d); cursor: pointer; transition: all .14s;
+}
+.linked-chip:hover { color: var(--gold); border-color: var(--gold); }
+.d-acts { display: flex; gap: .5rem; margin-top: 1.25rem; padding-top: 1.1rem; border-top: 1px solid var(--border); }
+
+/* Notification */
+.notif {
+  position: fixed; bottom: 1.25rem; left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--card); border: 1px solid var(--border-l);
+  padding: .65rem 1.1rem; border-radius: 2px; font-size: .82rem;
+  color: var(--text); z-index: 300; transition: transform .25s ease; white-space: nowrap;
+}
+.notif.show { transform: translateX(-50%) translateY(0); }
+.notif.ok { border-color: var(--suc); color: #5EC48A; }
+.notif.err { border-color: var(--fail); color: #C47A6B; }
+
+/* [hub-mobile] 手机端适配：侧边栏收成顶部横向条，头部换行，内容全宽 */
+@media (max-width: 640px) {
+  html, body { overflow: auto; height: auto; }
+  .app { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; height: auto; min-height: 100vh; }
+  .hdr { flex-wrap: wrap; height: auto; padding: .6rem .9rem; gap: .5rem .75rem; }
+  .hdr-logo { font-size: 1rem; }
+  .hdr-search { order: 3; flex: 1 1 100%; max-width: none; }
+  .hdr-right { margin-left: auto; }
+  .sidebar {
+    border-right: none; border-bottom: 1px solid var(--border);
+    display: flex; flex-direction: row; align-items: center;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    padding: .35rem .5rem; gap: .25rem;
+  }
+  .nav-sec-lbl { display: none; }
+  .nav-item {
+    border-left: none; border-bottom: 2px solid transparent;
+    white-space: nowrap; flex: 0 0 auto; padding: .5rem .7rem;
+  }
+  .nav-item.active { border-left-color: transparent; border-bottom-color: var(--gold); }
+  .content { padding: 1rem; }
+  .ch { flex-wrap: wrap; gap: .5rem; }
+  .ch-title { font-size: 1.4rem; }
+  .card-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ SETTINGS SCREEN ══════════════ -->
+<div id="scr-cfg" class="screen-settings">
+  <div class="cfg-card">
+    <div class="cfg-logo">MENU DB</div>
+    <div class="cfg-sub" data-i18n="cfgSub">连接到你的 GitHub 私有数据库</div>
+
+    <div class="fg">
+      <label class="fl">GitHub Personal Access Token</label>
+      <input type="password" id="cfg-tok" class="fi" placeholder="ghp_xxxxxxxxxxxx">
+      <div class="fhint" data-i18n="tokHint">需要 repo 权限 · 不会被存储到本地</div>
+    </div>
+    <div class="fg">
+      <label class="fl" data-i18n="lblOwner2">仓库所有者（用户名）</label>
+      <input type="text" id="cfg-own" class="fi" placeholder="your-username">
+    </div>
+    <div class="fg">
+      <label class="fl" data-i18n="lblRepo2">私有仓库名</label>
+      <input type="text" id="cfg-rep" class="fi" placeholder="my-databases">
+    </div>
+    <div class="frow">
+      <div class="fg">
+        <label class="fl" data-i18n="lblBranch">分支</label>
+        <input type="text" id="cfg-br" class="fi" value="main">
+      </div>
+      <div class="fg">
+        <label class="fl" data-i18n="lblPath2">文件路径</label>
+        <input type="text" id="cfg-pa" class="fi" value="menu.json">
+      </div>
+    </div>
+
+    <div class="fg">
+      <label class="fl" data-i18n="lblAiKey">Anthropic API Key（AI 整理用，可留空）</label>
+      <input type="password" id="cfg-ai" class="fi" placeholder="sk-ant-...">
+      <div class="fhint" data-i18n="aiKeyHint">只存这台设备的浏览器，不进仓库、不发给别处。留空则「AI 整理」不可用。</div>
+    </div>
+
+    <button class="btn btn-gold" onclick="doConnect()" data-i18n="connectBtn2">连 接 →</button>
+    <button class="btn btn-ghost btn-w" onclick="doOffline()" data-i18n="offlineBtn">离线使用（本地缓存）</button>
+  </div>
+</div>
+
+<!-- ══════════════ APP ══════════════ -->
+<div id="app" class="app">
+
+  <!-- Header -->
+  <header class="hdr">
+    <div class="hdr-logo">MENU DB</div>
+    <div class="hdr-sep"></div>
+    <input class="hdr-search" data-i18n-ph="searchPh" placeholder="搜索名称、描述、标签…" oninput="onSearch(this.value)">
+    <div class="hdr-right">
+      <span class="save-st" id="save-st"></span>
+      <button class="btn btn-ghost btn-sm" id="langBtn" onclick="toggleLang()">EN</button>
+      <button class="btn btn-ghost btn-sm" id="btn-gh-save" onclick="ghSave()" data-i18n="ghSaveBtn" style="display:none">↑ 保存至 GitHub</button>
+      <button class="btn btn-ghost btn-sm" id="btn-publish" onclick="publishPublic()" data-i18n="publishBtn" data-i18n-title="publishTitle" title="发布勾选了「公开展示」的菜品到个人网站数据">🌐 发布公开</button>
+      <button class="btn btn-ghost btn-sm" onclick="goSettings()" data-i18n="settingsBtn">设置</button>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="nav-sec-lbl" data-i18n="secCreate">创 作 区</div>
+    <div class="nav-item" data-c="recipes"     onclick="setCat('recipes')">    <span class="nav-ico">🍳</span> <span data-i18n="catRecipes">食谱</span> <span class="nav-ct" id="ct-recipes">0</span></div>
+    <div class="nav-item" data-c="cocktails"   onclick="setCat('cocktails')">  <span class="nav-ico">🍸</span> <span data-i18n="catCocktails">调酒</span> <span class="nav-ct" id="ct-cocktails">0</span></div>
+    <div class="nav-item" data-c="baking"      onclick="setCat('baking')">     <span class="nav-ico">🥐</span> <span data-i18n="catBaking">烘焙</span> <span class="nav-ct" id="ct-baking">0</span></div>
+    <div class="nav-sec-lbl" style="margin-top:.5rem" data-i18n="secFamily">家 里 的 菜</div>
+    <div class="nav-item" data-c="family"      onclick="setCat('family')">     <span class="nav-ico">🍲</span> <span data-i18n="catFamily">家人菜谱</span> <span class="nav-ct" id="ct-family">0</span></div>
+    <div class="nav-sec-lbl" style="margin-top:.5rem" data-i18n="secMaterial">素 材 库</div>
+    <div class="nav-item" data-c="ingredients" onclick="setCat('ingredients')"><span class="nav-ico">🥬</span> <span data-i18n="catIngredients">食材</span> <span class="nav-ct" id="ct-ingredients">0</span></div>
+    <div class="nav-item" data-c="spirits"     onclick="setCat('spirits')">    <span class="nav-ico">🥃</span> <span data-i18n="catSpirits">酒品</span> <span class="nav-ct" id="ct-spirits">0</span></div>
+  </nav>
+
+  <!-- Content -->
+  <main class="content" id="content"></main>
+</div>
+
+<!-- ══════════════ MODAL ══════════════ -->
+<div class="modal-bg" id="modal-bg" onclick="closeModalBg(event)">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="modal-ttl">添加</div>
+      <button class="modal-x" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body"></div>
+    <div class="modal-ftr">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()" data-i18n="cancelBtn">取消</button>
+      <button class="btn btn-gold btn-sm" style="width:auto" onclick="saveItem()" data-i18n="saveBtn">保 存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ DETAIL PANEL ══════════════ -->
+<div class="detail" id="detail">
+  <button class="detail-x" onclick="closeDetail()">✕</button>
+  <div id="detail-body"></div>
+</div>
+
+<!-- Notification -->
+<div class="notif" id="notif"></div>
+
+<script>
+// ═══════════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════════
+const ZONES = [
+  { id:'all',      lbl:'全 部', lblEn:'All' },
+  { id:'external', lbl:'外部区', lblEn:'External', clr:'#6B8FA8' },
+  { id:'mastered', lbl:'掌握区', lblEn:'Mastered', clr:'#5E8F6E' },
+  { id:'idea',     lbl:'想法区', lblEn:'Ideas', clr:'#C9963A' },
+  { id:'success',  lbl:'成功区', lblEn:'Success', clr:'#4E8F74' },
+  { id:'failure',  lbl:'失败区', lblEn:'Failure', clr:'#A86B5E' },
+];
+const ZONE_MAP = Object.fromEntries(ZONES.slice(1).map(z=>[z.id,z]));
+
+const CATS = {
+  recipes:     { lbl:'食谱', lblEn:'Recipes',     ico:'🍳', zone:true,  acc:'#C4785A' },
+  cocktails:   { lbl:'调酒', lblEn:'Cocktails',   ico:'🍸', zone:true,  acc:'#7A8EC4' },
+  baking:      { lbl:'烘焙', lblEn:'Baking',      ico:'🥐', zone:true,  acc:'#C4A45A' },
+  family:      { lbl:'家人菜谱', lblEn:'Family',   ico:'🍲', zone:false, acc:'#C46A8E' },
+  ingredients: { lbl:'食材', lblEn:'Ingredients', ico:'🥬', zone:false, acc:'#5AC47A' },
+  spirits:     { lbl:'酒品', lblEn:'Spirits',     ico:'🥃', zone:false, acc:'#A45AC4' },
+};
+
+/* ── 中英双语（pha-lang，跨页面共享）；食材/酒品分类等存储枚举值不译 ── */
+let lang=(()=>{try{return localStorage.getItem("pha-lang")==="en"?"en":"zh"}catch(e){return "zh"}})();
+const clbl=o=>(lang==="en"&&o&&o.lblEn)?o.lblEn:(o?o.lbl:"");
+const I18N={
+  cfgSub:{zh:"连接到你的 GitHub 私有数据库",en:"Connect to your private GitHub database"},
+  tokHint:{zh:"需要 repo 权限 · 不会被存储到本地",en:"Needs repo scope · not stored locally"},
+  lblOwner2:{zh:"仓库所有者（用户名）",en:"Repo owner (username)"},
+  lblRepo2:{zh:"私有仓库名",en:"Private repo name"},
+  lblBranch:{zh:"分支",en:"Branch"},
+  lblPath2:{zh:"文件路径",en:"File path"},
+  connectBtn2:{zh:"连 接 →",en:"Connect →"},
+  offlineBtn:{zh:"离线使用（本地缓存）",en:"Use offline (local cache)"},
+  searchPh:{zh:"搜索名称、描述、标签…",en:"Search name, description, tags…"},
+  ghSaveBtn:{zh:"↑ 保存至 GitHub",en:"↑ Save to GitHub"},
+  publishBtn:{zh:"🌐 发布公开",en:"🌐 Publish"},
+  publishTitle:{zh:"发布勾选了「公开展示」的菜品到个人网站数据",en:"Publish items marked “public” to your site data"},
+  settingsBtn:{zh:"设置",en:"Settings"},
+  lblAiKey:{zh:"Anthropic API Key（AI 整理用，可留空）",en:"Anthropic API key (for AI tidy-up, optional)"},
+  aiKeyHint:{zh:"只存这台设备的浏览器，不进仓库、不发给别处。留空则「AI 整理」不可用。",en:"Stored in this browser only — never committed or sent elsewhere. Leave blank to disable AI tidy-up."},
+  secCreate:{zh:"创 作 区",en:"CREATE"},
+  secMaterial:{zh:"素 材 库",en:"PANTRY"},
+  catRecipes:{zh:"食谱",en:"Recipes"},
+  catCocktails:{zh:"调酒",en:"Cocktails"},
+  catBaking:{zh:"烘焙",en:"Baking"},
+  catIngredients:{zh:"食材",en:"Ingredients"},
+  catSpirits:{zh:"酒品",en:"Spirits"},
+  cancelBtn:{zh:"取消",en:"Cancel"},
+  saveBtn:{zh:"保 存",en:"Save"},
+  add:{zh:"添加",en:"Add "},
+  edit2:{zh:"编辑",en:"Edit "},
+  addBtn:{zh:"＋ 添加",en:"+ Add"},
+  all:{zh:"全部",en:"All"},
+  noResults:{zh:"无搜索结果",en:"No results"},
+  noData:{zh:"暂无数据，点击「添加」开始记录",en:"No data yet — tap “Add” to start"},
+  steps:{zh:"步骤",en:"Steps"},
+  source:{zh:"来源",en:"Source"},
+  origin:{zh:"产地",en:"Origin"},
+  summary:{zh:"简介",en:"Summary"},
+  ingredients:{zh:"食材",en:"Ingredients"},
+  spiritsL:{zh:"酒品",en:"Spirits"},
+  notes:{zh:"备注",en:"Notes"},
+  tags:{zh:"标签",en:"Tags"},
+  usedIn:{zh:"使用于",en:"Used in"},
+  editBtn:{zh:"编辑",en:"Edit"},
+  delBtn:{zh:"删除",en:"Delete"},
+  name:{zh:"名称",en:"Name"},
+  category:{zh:"分类",en:"Category"},
+  type:{zh:"类型",en:"Type"},
+  abv:{zh:"酒精度 ABV%",en:"ABV %"},
+  zone:{zh:"区域",en:"Zone"},
+  secFamily:{zh:"家 里 的 菜",en:"F A M I L Y"},
+  catFamily:{zh:"家人菜谱",en:"Family recipes"},
+  famInvites:{zh:"邀请家人",en:"Invite family"},
+  famAccept:{zh:"收下",en:"Accept"},
+  famDiscard:{zh:"丢掉",en:"Discard"},
+  famPending:{zh:"条待收",en:"pending"},
+  famInboxEmpty:{zh:"收件箱是空的",en:"Inbox is empty"},
+  famCheckInbox:{zh:"查看收件箱",en:"Check inbox"},
+  famRefresh:{zh:"刷新",en:"Refresh"},
+  famRetry:{zh:"重试",en:"Retry"},
+  famLoading:{zh:"读取中…",en:"Loading…"},
+  famNeedGh:{zh:"先连接 GitHub 才能收家人菜谱",en:"Connect GitHub first"},
+  famNoInboxRepo:{zh:"找不到收件箱仓库 family-recipes-inbox（或当前令牌无权访问）",en:"Inbox repo family-recipes-inbox not found (or token lacks access)"},
+  famHintFine:{zh:"——你这台设备用的是**细粒度令牌**（github_pat_ 开头）。去 GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens → 点开这把令牌 → Repository access 里把 family-recipes-inbox **加进去**（权限给 Contents: Read and write）→ Update。改完回来点「重试」即可，不用重新登录。",en:" — this device uses a fine-grained token. Add family-recipes-inbox to its Repository access (Contents: Read and write), then retry."},
+  famHintClassic:{zh:"——你用的是 classic 令牌（ghp_ 开头），理论上能访问自己所有私有库。若仍报错：确认令牌勾了 repo 权限、且仓库名是 NickkkLian/family-recipes-inbox。",en:" — classic token in use; confirm it has the repo scope."},
+  famHintUnknown:{zh:"——认不出令牌类型，请在「设置」里确认令牌与仓库所有者填对了。",en:" — unrecognized token type; check Settings."},
+  famUnnamed:{zh:"（未命名）",en:"(untitled)"},
+  famRawTag:{zh:"未整理",en:"raw"},
+  famRaw:{zh:"家人原话",en:"In their words"},
+  famRawKept:{zh:"家人的原话与照片不在这张表里，编辑不会动它们。",en:"Their original words and photos are kept untouched by this form."},
+  famIngs:{zh:"材料",en:"Ingredients"},
+  famTip:{zh:"火候与小秘诀",en:"Tips"},
+  famStory:{zh:"这道菜的故事",en:"Story"},
+  famTaste:{zh:"口味与份量",en:"Taste & serving"},
+  famPhotos:{zh:"照片",en:"Photos"},
+  famSubmitted:{zh:"提交于",en:"Submitted"},
+  famAi:{zh:"AI 整理",en:"AI tidy-up"},
+  famAiAgain:{zh:"重新 AI 整理",en:"Re-run AI tidy-up"},
+  famOrganizing:{zh:"整理中…",en:"Tidying…"},
+  famRefused:{zh:"模型拒绝处理这一条",en:"Model refused this entry"},
+  famNoKey:{zh:"还没配 Anthropic API Key —— 点右上角「设置」填一次就行（只存这台设备）",en:"No Anthropic API key yet — set it once in Settings (stored on this device only)"},
+  famKeyBad:{zh:"Anthropic API Key 被拒（401）——去「设置」里核对一下，本地保存的没动",en:"Anthropic API key rejected (401) — check it in Settings; the stored value was left untouched"},
+  famToRecipe:{zh:"存进食谱区",en:"Copy to Recipes"},
+  famToRecipeAgain:{zh:"再存一份到食谱区",en:"Copy again to Recipes"},
+  famWho:{zh:"谁做的",en:"Who"},
+  famWhoPh:{zh:"爸 / 妈 / 外婆…",en:"Dad / Mum / Grandma…"},
+  famRel:{zh:"关系（可空）",en:"Relation (optional)"},
+  famRelPh:{zh:"父亲 / 外祖母…",en:"father / grandmother…"},
+  famMakeLink:{zh:"生成链接",en:"Create link"},
+  famCopy:{zh:"复制链接",en:"Copy link"},
+  famKind:{zh:"分类",en:"Kind"},
+  famEditName:{zh:"改名字",en:"Rename"},
+  famSave:{zh:"保存",en:"Save"},
+  famCancel:{zh:"取消",en:"Cancel"},
+  famRevoke:{zh:"作废",en:"Revoke"},
+  famUnrevoke:{zh:"恢复",en:"Restore"},
+  famRevoked:{zh:"已作废",en:"revoked"},
+  famNoInvites:{zh:"还没有邀请链接",en:"No invite links yet"},
+  famWhoNeeded:{zh:"先写这条链接是给谁的",en:"Say who this link is for"},
+  famPerLine:{zh:"（一行一个）",en:" (one per line)"},
+  famInviteNote:{zh:"一人一条链接：他填的内容会自动带上他的名字。改名字不影响已发出的链接；作废＝停用但留记录，删除＝停用且不留记录。",en:"One link per person: submissions carry their name automatically. Renaming keeps the link working; revoke disables but keeps the row, delete removes it."},
+  publicLbl:{zh:"公开展示",en:"Public"},
+  publicHint:{zh:"勾选后「发布公开」会包含此条目",en:"When checked, “Publish” includes this item"},
+  description:{zh:"描述",en:"Description"},
+  linkIng:{zh:"关联食材",en:"Linked ingredients"},
+  linkSpi:{zh:"关联酒品",en:"Linked spirits"},
+  selectCat:{zh:"选择分类",en:"Select category"},
+  selectType:{zh:"选择类型",en:"Select type"},
+  selectZone:{zh:"选择区域",en:"Select zone"},
+  phName:{zh:"输入名称",en:"Enter name"},
+  phSource:{zh:"书名 / 网站 / 人名",en:"Book / site / person"},
+  phDesc:{zh:"简短描述…",en:"Short description…"},
+  phNotes:{zh:"补充说明…",en:"More notes…"},
+  phSearchIng:{zh:"搜索食材…",en:"Search ingredients…"},
+  phSearchSpi:{zh:"搜索酒品…",en:"Search spirits…"},
+  phTags:{zh:"输入后按 Enter 或逗号",en:"Type then Enter or comma"},
+  assocEmpty:{zh:"暂无数据，请先在素材库添加",en:"No items — add some in the Pantry first"},
+  addStep:{zh:"${L('addStep')}",en:"+ Add step"},
+  dataNotLoaded:{zh:"数据未加载",en:"Data not loaded"},
+  noPublic:{zh:"还没有勾选「公开展示」的条目",en:"No items marked “public” yet"},
+  publishFail:{zh:"发布失败：",en:"Publish failed: "},
+  fillCfg:{zh:"请填写 Token、用户名、仓库名",en:"Fill in Token, username, repo"},
+  connecting:{zh:"连接中…",en:"Connecting…"},
+  loaded:{zh:"加载成功 ✓",en:"Loaded ✓"},
+  fileCreated:{zh:"未找到文件，已创建空数据库",en:"File not found — empty database created"},
+  connFail:{zh:"连接失败：",en:"Connection failed: "},
+  connectFirst:{zh:"请先连接 GitHub",en:"Connect GitHub first"},
+  savedGh:{zh:"已保存至 GitHub ✓",en:"Saved to GitHub ✓"},
+  autoSyncFail:{zh:"自动同步失败：",en:"Auto-sync failed: "},
+  enterName:{zh:"请输入名称",en:"Enter a name"},
+  unsaved:{zh:"● 未保存",en:"● Unsaved"},
+  offlineMode:{zh:"离线模式",en:"Offline"},
+  synced:{zh:"已同步",en:"Synced"},
+  syncIn3s:{zh:"● 3s 后同步…",en:"● syncing in 3s…"},
+  syncing:{zh:"同步中…",en:"Syncing…"},
+};
+const L=k=>(I18N[k]||{zh:k,en:k})[lang];
+function applyStatic(){
+  document.querySelectorAll("[data-i18n]").forEach(el=>{const k=el.dataset.i18n;if(I18N[k])el.textContent=I18N[k][lang]});
+  document.querySelectorAll("[data-i18n-ph]").forEach(el=>{const k=el.dataset.i18nPh;if(I18N[k])el.placeholder=I18N[k][lang]});
+  document.querySelectorAll("[data-i18n-title]").forEach(el=>{const k=el.dataset.i18nTitle;if(I18N[k])el.title=I18N[k][lang]});
+  const lb=document.getElementById("langBtn");if(lb)lb.textContent=lang==="zh"?"EN":"中";
+  document.documentElement.lang=lang==="zh"?"zh-CN":"en";
+}
+function toggleLang(){lang=lang==="zh"?"en":"zh";try{localStorage.setItem("pha-lang",lang)}catch(e){}applyStatic();if(typeof renderAll==="function"&&S&&S.data){renderAll();closeDetail&&closeDetail();}}
+
+const ING_CATS   = ['蔬菜','肉类','海鲜','乳制品','谷物','调味料','坚果','水果','其他'];
+const SPI_TYPES  = ['威士忌','朗姆酒','金酒','伏特加','龙舌兰','白兰地','利口酒','葡萄酒','啤酒','清酒','中国白酒','其他'];
+
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+const S = {
+  cfg:  null,   // { token, owner, repo, branch, path } | { offline:true }
+  data: null,   // the parsed menu.json
+  sha:  null,   // github file sha
+  dirty:false,
+  ui: { cat:'recipes', zone:'all', filter:'all', filter2:'all', q:'' },
+  editing: null,          // { id, cat } | null
+  tmp: { tags:[], ing:[], spi:[], steps:[] },
+};
+
+function today(){ return new Date().toISOString().split('T')[0]; }
+function uid()  { return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function mkData(){ return { meta:{ version:'1.0', last_updated:today() }, ingredients:[], spirits:[], recipes:[], cocktails:[], baking:[], family:[] }; }
+// 老 menu.json 里没有 family 键 —— 每次读完补上，否则渲染与保存都会炸
+function normData(){ if(S.data && !Array.isArray(S.data.family)) S.data.family=[]; }
+
+// ═══════════════════════════════════════════
+//  GITHUB API
+// ═══════════════════════════════════════════
+async function ghApi(url, opts={}){
+  const r = await fetch(url,{...opts, headers:{
+    Authorization:`Bearer ${S.cfg.token}`,
+    Accept:'application/vnd.github.v3+json',
+    'Content-Type':'application/json',
+    ...opts.headers
+  }});
+  if(!r.ok) throw new Error(`${r.status}: ${await r.text()}`);
+  return r.json();
+}
+
+async function ghLoad(){
+  const {owner,repo,branch,path} = S.cfg;
+  const f = await ghApi(`https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}&_=${Date.now()}`);
+  S.sha = f.sha;
+  const txt = decodeURIComponent(escape(atob(f.content.replace(/\n/g,''))));
+  S.data = JSON.parse(txt);
+  normData();
+}
+
+async function ghSave(){
+  if(!S.cfg?.token){ notify(L('connectFirst'),'err'); return; }
+  S.data.meta.last_updated = today();
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(S.data,null,2))));
+  const {owner,repo,branch,path} = S.cfg;
+  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+  const mkBody = () => { const b = { message:`Update menu.json – ${today()}`, content, branch }; if(S.sha) b.sha = S.sha; return JSON.stringify(b); };
+  try{
+    let res;
+    try{ res = await ghApi(url,{method:'PUT',body:mkBody()}); }
+    catch(e){
+      if(!/^(409|422)/.test(e.message)) throw e;   // 仅 sha 过期/缺失时：取最新 sha 重试一次
+      const f = await ghApi(`${url}?ref=${branch}&_=${Date.now()}`).catch(()=>null);
+      S.sha = f?.sha || null;
+      res = await ghApi(url,{method:'PUT',body:mkBody()});
+    }
+    S.sha = res.content.sha;
+    S.dirty = false;
+    updSaveStatus();
+    notify(L('savedGh'),'ok');
+  }catch(e){
+    notify('保存失败 Save failed: '+e.message,'err');   // 之前异常未捕获：界面毫无提示、看起来像保存成功
+  }
+}
+
+// 公开数据：仅菜品类（食谱/调酒/烘焙）；配料只导出名称，notes 私人备注不出
+function buildPublicData(){
+  const cats=[['recipes','食谱'],['cocktails','调酒'],['baking','烘焙']];
+  const nameOf=(list,id)=>{const x=(list||[]).find(i=>i.id===id);return x?x.name:null};
+  const sections=[];
+  for(const [cat,label] of cats){
+    const pub=(S.data[cat]||[]).filter(i=>i.public);
+    if(!pub.length) continue;
+    sections.push({type:cat,label,items:pub.map(it=>{
+      const ing=[...(it.ingredient_ids||[]).map(id=>nameOf(S.data.ingredients,id)),...(it.spirit_ids||[]).map(id=>nameOf(S.data.spirits,id))].filter(Boolean);
+      const parts=[];
+      if(ing.length) parts.push('配料：'+ing.join('、'));
+      if((it.steps||[]).length) parts.push(it.steps.join('\n'));
+      return {id:it.id,name:it.name||'',summary:it.description||'',category:label,content:parts.join('\n\n'),tags:it.tags||[],updatedAt:it.date_modified||''};
+    })});
+  }
+  return {dbId:'menu',title:'私房菜单',generatedAt:new Date().toISOString(),sections};
+}
+// 发布公开数据：直接写入 GitHub 数据仓库（与主数据同仓库，根目录）；
+// 未配置 GitHub 或发布失败时回退为本地下载
+async function publishPublic(){
+  if(!S.data){notify(L('dataNotLoaded'),'err');return}
+  const data=buildPublicData();
+  const count=data.sections.reduce((n,s)=>n+s.items.length,0);
+  if(!count){notify(L('noPublic'),'err');return}
+  const filename='menu.public.json',json=JSON.stringify(data,null,2);
+  if(S.cfg?.token){
+    try{
+      const PUBLIC_REPO='Database-Public'; // 公开数据专用仓库（public）——网站只从这里读取，碰不到私有库
+      const {owner}=S.cfg;
+      const base=`https://api.github.com/repos/${owner}/${PUBLIC_REPO}/contents/${filename}`;
+      let sha;
+      try{ sha=(await ghApi(`${base}?_=${Date.now()}`)).sha; }catch(e){ sha=undefined; }
+      const body={message:`publish ${filename} (${count} entries)`,content:btoa(unescape(encodeURIComponent(json)))};
+      if(sha)body.sha=sha;
+      await ghApi(base,{method:'PUT',body:JSON.stringify(body)});
+      notify(lang==="en"?`Published ${count} items → ${filename} ✓`:`已发布 ${count} 条公开内容 → ${filename} ✓`,'ok');
+      return;
+    }catch(e){notify(L('publishFail')+e.message+(lang==="en"?" — saved locally instead":"，已转为本地下载"),'err')}
+  }
+  const blob=new Blob([json],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  notify(lang==="en"?`Exported ${count} items (downloaded)`:`已导出 ${count} 条公开内容（本地下载）`,'ok');
+}
+
+// ═══════════════════════════════════════════
+//  CONNECT
+// ═══════════════════════════════════════════
+async function doConnect(){
+  saveAiKey();
+  const token  = document.getElementById('cfg-tok').value.trim();
+  const owner  = document.getElementById('cfg-own').value.trim();
+  const repo   = document.getElementById('cfg-rep').value.trim();
+  const branch = document.getElementById('cfg-br').value.trim()||'main';
+  const path   = document.getElementById('cfg-pa').value.trim()||'menu.json';
+  if(!token||!owner||!repo){ notify(L('fillCfg'),'err'); return; }
+  S.cfg = { token, owner, repo, branch, path };
+  localStorage.setItem('menu_cfg', JSON.stringify({ token, owner, repo, branch, path }));
+  try {
+    notify(L('connecting'),'');
+    await ghLoad();
+    notify(L('loaded'),'ok');
+  } catch(e){
+    if(e.message.startsWith('404')){ S.data=mkData(); S.sha=null; notify(L('fileCreated'),'ok'); }
+    else { notify(L('connFail')+e.message,'err'); return; }
+  }
+  showApp();
+}
+
+function doOffline(){
+  saveAiKey();
+  S.cfg = { offline:true };
+  const saved = localStorage.getItem('menu_data_offline');
+  S.data = saved ? JSON.parse(saved) : mkData();
+  showApp();
+}
+
+function goSettings(){
+  try{ const ak=localStorage.getItem(AIKEY); const el=document.getElementById('cfg-ai'); if(el) el.value=ak||''; }catch(e){}
+  document.getElementById('scr-cfg').style.display='flex';
+  document.getElementById('app').style.display='none';
+}
+
+function showApp(){
+  document.getElementById('scr-cfg').style.display='none';
+  document.getElementById('app').style.display='grid';
+  document.getElementById('btn-gh-save').style.display = S.cfg?.token ? 'inline-flex' : 'none';
+  renderAll();
+}
+
+// ═══════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════
+function renderAll(){ updCounts(); renderContent(); updActiveNav(); updSaveStatus(); }
+
+function updCounts(){
+  ['recipes','cocktails','baking','family','ingredients','spirits'].forEach(c=>{
+    const el=document.getElementById('ct-'+c);
+    if(el) el.textContent=(S.data[c]||[]).length;
+  });
+}
+
+function updActiveNav(){
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    el.classList.toggle('active', el.dataset.c===S.ui.cat);
+  });
+}
+
+function updSaveStatus(){
+  const el=document.getElementById('save-st');
+  if(!el) return;
+  el.textContent = S.dirty ? L('unsaved') : (S.cfg?.offline ? L('offlineMode') : L('synced'));
+  el.style.color  = S.dirty ? 'var(--idea)' : (S.cfg?.offline ? 'var(--text-dd)' : 'var(--suc)');
+}
+
+let _syncTimer;
+function markDirty(){
+  S.dirty=true;
+  if(S.cfg?.offline) localStorage.setItem('menu_data_offline',JSON.stringify(S.data));
+  if(S.cfg?.token){
+    clearTimeout(_syncTimer);
+    const st=document.getElementById('save-st');
+    if(st){ st.textContent=L('syncIn3s'); st.style.color='var(--idea)'; }
+    _syncTimer=setTimeout(async()=>{
+      const st2=document.getElementById('save-st');
+      if(st2){ st2.textContent=L('syncing'); st2.style.color='var(--text-d)'; }
+      try{ await ghSave(); }
+      catch(e){ notify(L('autoSyncFail')+e.message,'err'); S.dirty=true; updSaveStatus(); }
+    },3000);
+  } else { updSaveStatus(); }
+}
+
+function setCat(cat){ S.ui.cat=cat; S.ui.zone='all'; S.ui.filter='all'; S.ui.filter2='all'; closeDetail(); renderAll(); }
+function setZone(z){ S.ui.zone=z; renderContent(); }
+function setFilter(f){ S.ui.filter=f; S.ui.filter2='all'; renderContent(); }
+function setFilter2(f){ S.ui.filter2=f; renderContent(); }
+function onSearch(v){ S.ui.q=v; renderContent(); }
+
+function renderContent(){
+  const cat=S.ui.cat, info=CATS[cat];
+  const items=S.data[cat]||[];
+  const q=S.ui.q.toLowerCase();
+  // 家人菜谱条数多（导入后 80+），只搜名字与描述不够用 —— 材料、步骤、备注、原话都要能搜到
+  const hay = i => [i.name, i.description, i.notes, i.raw, i.tip, i.story,
+                    (i.ingredients||[]).join(' '), (i.raw_ingredients||[]).join(' '),
+                    (i.steps||[]).join(' '), (i.tags||[]).join(' ')]
+                   .filter(Boolean).join(' ').toLowerCase();
+  let filtered = q ? items.filter(i => cat==='family'
+      ? hay(i).includes(q)
+      : (i.name.toLowerCase().includes(q) ||
+         (i.description||'').toLowerCase().includes(q) ||
+         (i.tags||[]).some(t=>t.toLowerCase().includes(q)))
+  ) : items;
+
+  let html = `<div class="ch">
+    <div class="ch-left">
+      <span style="font-size:1.4rem">${info.ico}</span>
+      <span class="ch-title">${clbl(info)}</span>
+      <span class="ch-count">@@COUNT@@</span>
+    </div>
+    <div style="display:flex;gap:.4rem">
+      ${cat==='family'?`<button class="btn btn-ghost btn-sm" style="width:auto" onclick="openInvites()">${L('famInvites')}</button>`:''}
+      <button class="btn btn-gold btn-sm" style="width:auto" onclick="openAdd()">${L('addBtn')}</button>
+    </div>
+  </div>`;
+  if(cat==='family') html+=famInboxBanner();
+
+  if(info.zone){
+    html+=`<div class="ztabs">`;
+    ZONES.forEach(z=>{
+      const cnt = z.id==='all' ? items.length : items.filter(i=>i.zone===z.id).length;
+      const ac  = S.ui.zone===z.id ? 'active' : '';
+      const st  = (ac&&z.clr) ? `background:${z.clr};` : '';
+      html+=`<button class="ztab ${ac}" style="${st}" onclick="setZone('${z.id}')">${clbl(z)} (${cnt})</button>`;
+    });
+    html+=`</div>`;
+    if(S.ui.zone!=='all') filtered=filtered.filter(i=>i.zone===S.ui.zone);
+  } else if(cat==='family'){
+    // 两个维度：谁做的（人）+ 分类（标签里的体裁/小类）。84 道之后单一维度不够用
+    const people=[...new Set(items.map(i=>i.contributor).filter(Boolean))];
+    html+=`<div class="flt-row"><span class="flt-lbl">${L('famWho')}</span>
+      <button class="flt-btn ${S.ui.filter==='all'?'active':''}" onclick="setFilter('all')">${L('all')} (${items.length})</button>`;
+    people.forEach(v=>{ const n=items.filter(i=>i.contributor===v).length;
+      html+=`<button class="flt-btn ${S.ui.filter===v?'active':''}" onclick="setFilter('${esc(v)}')">${esc(v)} (${n})</button>`; });
+    html+=`</div>`;
+    if(S.ui.filter!=='all') filtered=filtered.filter(i=>i.contributor===S.ui.filter);
+
+    // 分类芯片只列当前人还剩下的类别（避免点了人之后出现 0 条的空按钮）
+    const SKIP=new Set(people);
+    const cats=[...new Set(filtered.flatMap(i=>(i.tags||[]).filter(x=>!SKIP.has(x))))];
+    if(cats.length>1){
+      html+=`<div class="flt-row"><span class="flt-lbl">${L('famKind')}</span>
+        <button class="flt-btn ${S.ui.filter2==='all'?'active':''}" onclick="setFilter2('all')">${L('all')}</button>`;
+      cats.forEach(v=>{ const n=filtered.filter(i=>(i.tags||[]).includes(v)).length;
+        html+=`<button class="flt-btn ${S.ui.filter2===v?'active':''}" onclick="setFilter2('${esc(v)}')">${esc(v)} (${n})</button>`; });
+      html+=`</div>`;
+    }
+    if(S.ui.filter2 && S.ui.filter2!=='all') filtered=filtered.filter(i=>(i.tags||[]).includes(S.ui.filter2));
+  } else {
+    const key = cat==='ingredients' ? 'category' : 'type';
+    const uniq = [...new Set(items.map(i=>i[key]).filter(Boolean))];
+    if(uniq.length){
+      html+=`<div class="flt-row">
+        <button class="flt-btn ${S.ui.filter==='all'?'active':''}" onclick="setFilter('all')">${L('all')}</button>`;
+      uniq.forEach(v=>{ html+=`<button class="flt-btn ${S.ui.filter===v?'active':''}" onclick="setFilter('${esc(v)}')">${v}</button>`; });
+      html+=`</div>`;
+      if(S.ui.filter!=='all') filtered=filtered.filter(i=>i[key]===S.ui.filter);
+    }
+  }
+
+  if(!filtered.length){
+    html+=`<div class="empty"><div class="empty-ico">${info.ico}</div><div class="empty-txt">${q?L('noResults'):L('noData')}</div></div>`;
+  } else {
+    html+=`<div class="card-grid">`;
+    filtered.forEach(item=>{ html+= cat==='family' ? famCard(item) : renderCard(item,cat,info); });
+    html+=`</div>`;
+  }
+
+  // 计数必须等所有筛选（搜索 + 谁做的 + 分类）都应用完才算 —— 之前在筛选前就渲染，
+  // 结果点了「家人A」只显示 5 张卡、计数却还写着 84 项
+  const cnt = filtered.length + (filtered.length!==items.length ? '/'+items.length : '') + (lang==="en"?" items":" 项");
+  document.getElementById('content').innerHTML = html.replace('@@COUNT@@', cnt);
+  if(cat==='family') famHydrateImgs(document.getElementById('content'));
+}
+
+function renderCard(item,cat,info){
+  const z   = item.zone ? ZONE_MAP[item.zone] : null;
+  const barC = z ? z.clr : info.acc;
+  let badge='';
+  if(z) badge=`<span class="card-zone" style="background:${z.clr}22;color:${z.clr}">${clbl(z)}</span>`;
+  if(cat==='ingredients'&&item.category) badge=`<span class="card-zone" style="background:var(--ing)22;color:var(--ing)">${item.category}</span>`;
+  if(cat==='spirits'&&item.type) badge=`<span class="card-zone" style="background:var(--spi)22;color:var(--spi)">${item.type}${item.abv?` ${item.abv}%`:''}</span>`;
+
+  const ingN=(item.ingredient_ids||[]).length;
+  const spiN=(item.spirit_ids||[]).length;
+  const feet=[];
+  if(ingN) feet.push(`🥬 ${ingN}`);
+  if(spiN) feet.push(`🥃 ${spiN}`);
+  if((item.steps||[]).length) feet.push(`📋 ${item.steps.length}${lang==="en"?" steps":" 步"}`);
+
+  const tags=(item.tags||[]).slice(0,4).map(t=>`<span class="card-tag">${t}</span>`).join('');
+
+  return `<div class="card" onclick="showDetail('${item.id}','${cat}')">
+    <div class="card-bar" style="background:${barC}"></div>
+    ${badge}
+    <div class="card-name">${esc(item.name)}</div>
+    ${item.description?`<div class="card-desc">${esc(item.description)}</div>`:''}
+    ${tags?`<div class="card-tags">${tags}</div>`:''}
+    ${feet.length?`<div class="card-foot">${feet.join(' · ')}</div>`:''}
+    ${item.source?`<div class="card-src">${L('source')}：${esc(item.source)}</div>`:''}
+  </div>`;
+}
+
+// ═══════════════════════════════════════════
+//  DETAIL PANEL
+// ═══════════════════════════════════════════
+function showDetail(id,cat){
+  const item=S.data[cat].find(i=>i.id===id);
+  if(!item) return;
+  if(cat==='family'){
+    document.getElementById('detail-body').innerHTML=famDetail(item);
+    document.getElementById('detail').classList.add('open');
+    famHydrateImgs(document.getElementById('detail-body'));
+    return;
+  }
+  const info=CATS[cat];
+  const z=item.zone?ZONE_MAP[item.zone]:null;
+  let h='';
+
+  // Badge
+  if(z) h+=`<span class="card-zone" style="background:${z.clr}22;color:${z.clr}">${clbl(z)}</span>`;
+  if(cat==='ingredients'&&item.category) h+=`<span class="card-zone" style="background:var(--ing)22;color:var(--ing)">${item.category}</span>`;
+  if(cat==='spirits'&&item.type) h+=`<span class="card-zone" style="background:var(--spi)22;color:var(--spi)">${item.type}${item.abv?' · '+item.abv+'%':''}</span>`;
+
+  h+=`<div class="d-name">${esc(item.name)}</div>`;
+  if(item.source) h+=`<div class="d-src">${L('source')}：${esc(item.source)}</div>`;
+  if(item.origin) h+=`<div class="d-src">${L('origin')}：${esc(item.origin)}</div>`;
+  if(item.description) h+=`<div class="d-sec"><div class="d-sec-lbl">${L('summary')}</div><div class="d-text">${esc(item.description)}</div></div>`;
+
+  if((item.ingredient_ids||[]).length){
+    const chips=item.ingredient_ids.map(id=>{
+      const ing=S.data.ingredients.find(i=>i.id===id);
+      return ing?`<span class="linked-chip" onclick="jumpTo('${id}','ingredients')">${esc(ing.name)}</span>`:'';
+    }).join('');
+    h+=`<div class="d-sec"><div class="d-sec-lbl">${L('ingredients')}</div><div class="linked-chips">${chips}</div></div>`;
+  }
+  if((item.spirit_ids||[]).length){
+    const chips=item.spirit_ids.map(id=>{
+      const spi=S.data.spirits.find(i=>i.id===id);
+      return spi?`<span class="linked-chip" onclick="jumpTo('${id}','spirits')">${esc(spi.name)}</span>`:'';
+    }).join('');
+    h+=`<div class="d-sec"><div class="d-sec-lbl">${L('spiritsL')}</div><div class="linked-chips">${chips}</div></div>`;
+  }
+  if((item.steps||[]).length){
+    h+=`<div class="d-sec"><div class="d-sec-lbl">${L('steps')}</div><ol class="steps-ol">`;
+    item.steps.forEach(s=>{ h+=`<li>${esc(s)}</li>`; });
+    h+=`</ol></div>`;
+  }
+  if(item.notes) h+=`<div class="d-sec"><div class="d-sec-lbl">${L('notes')}</div><div class="d-text">${esc(item.notes)}</div></div>`;
+  if((item.tags||[]).length) h+=`<div class="d-sec"><div class="d-sec-lbl">${L('tags')}</div><div class="card-tags">${item.tags.map(t=>`<span class="card-tag">${esc(t)}</span>`).join('')}</div></div>`;
+
+  // Used in
+  if(!info.zone){
+    const key=cat==='ingredients'?'ingredient_ids':'spirit_ids';
+    const used=[];
+    ['recipes','cocktails','baking'].forEach(c=>{ (S.data[c]||[]).forEach(it=>{ if((it[key]||[]).includes(id)) used.push({c,it}); }); });
+    if(used.length){
+      const chips=used.map(({c,it})=>`<span class="linked-chip" onclick="jumpTo('${it.id}','${c}')">${CATS[c].ico} ${esc(it.name)}</span>`).join('');
+      h+=`<div class="d-sec"><div class="d-sec-lbl">${L('usedIn')}</div><div class="linked-chips">${chips}</div></div>`;
+    }
+  }
+
+  h+=`<div class="d-acts">
+    <button class="btn btn-ghost btn-sm" onclick="openEdit('${id}','${cat}')">${L('editBtn')}</button>
+    <button class="btn btn-danger btn-sm" onclick="delItem('${id}','${cat}')">${L('delBtn')}</button>
+  </div>`;
+
+  document.getElementById('detail-body').innerHTML=h;
+  document.getElementById('detail').classList.add('open');
+}
+
+function closeDetail(){ document.getElementById('detail').classList.remove('open'); }
+
+function jumpTo(id,cat){
+  S.ui.cat=cat; S.ui.zone='all'; closeDetail(); renderAll();
+  setTimeout(()=>showDetail(id,cat),120);
+}
+
+// ═══════════════════════════════════════════
+//  MODAL – ADD / EDIT
+// ═══════════════════════════════════════════
+function openAdd(){
+  S.editing=null;
+  S.tmp={ tags:[], ing:[], spi:[], steps:[] };
+  document.getElementById('modal-ttl').textContent=`${L('add')}${clbl(CATS[S.ui.cat])}`;
+  document.getElementById('modal-body').innerHTML=buildForm(S.ui.cat,null);
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function openEdit(id,cat){
+  const item=S.data[cat].find(i=>i.id===id);
+  if(!item) return;
+  S.editing={id,cat};
+  S.tmp={ tags:[...(item.tags||[])], ing:[...(item.ingredient_ids||[])], spi:[...(item.spirit_ids||[])], steps:[...(item.steps||[])] };
+  document.getElementById('modal-ttl').textContent=`${L('edit2')}${clbl(CATS[cat])}`;
+  document.getElementById('modal-body').innerHTML=buildForm(cat,item);
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function closeModal(){ document.getElementById('modal-bg').classList.remove('open'); }
+function closeModalBg(e){ if(e.target===document.getElementById('modal-bg')) closeModal(); }
+
+function field(lbl,inner){ return `<div class="fg"><label class="fl">${lbl}</label>${inner}</div>`; }
+
+function buildForm(cat,v){
+  const d=v||{};
+  let h='';
+  h+=field(L('name'),`<input class="fi" id="f-name" value="${esc(d.name||'')}" placeholder="${L('phName')}">`);
+
+  if(cat==='family'){
+    h+=field(L('famWho'),`<input class="fi" id="f-contrib" value="${esc(d.contributor||'')}" placeholder="${L('famWhoPh')}">`);
+    h+=field(L('famRel'),`<input class="fi" id="f-rel" value="${esc(d.relation||'')}" placeholder="${L('famRelPh')}">`);
+    h+=field(L('description'),`<textarea class="fi fta" id="f-desc">${esc(d.description||'')}</textarea>`);
+    h+=field(L('ingredients')+L('famPerLine'),`<textarea class="fi fta" id="f-fings">${esc((d.ingredients||[]).join('\n'))}</textarea>`);
+    h+=field(L('steps')+L('famPerLine'),`<textarea class="fi fta" id="f-fsteps">${esc((d.steps||[]).join('\n'))}</textarea>`);
+    h+=field(L('famTip'),`<textarea class="fi fta" id="f-ftip">${esc(d.tip||'')}</textarea>`);
+    h+=field(L('famStory'),`<textarea class="fi fta" id="f-fstory">${esc(d.story||'')}</textarea>`);
+    h+=field(L('notes'),`<textarea class="fi fta" id="f-notes">${esc(d.notes||'')}</textarea>`);
+    h+=`<div class="fam-note">${L('famRawKept')}</div>`;
+    return h;
+  }
+
+  if(cat==='ingredients'){
+    h+=field(L('category'),`<select class="fs" id="f-cat"><option value="">${L('selectCat')}</option>${ING_CATS.map(c=>`<option value="${c}"${d.category===c?' selected':''}>${c}</option>`).join('')}</select>`);
+  } else if(cat==='spirits'){
+    h+=field(L('type'),`<select class="fs" id="f-type"><option value="">${L('selectType')}</option>${SPI_TYPES.map(t=>`<option value="${t}"${d.type===t?' selected':''}>${t}</option>`).join('')}</select>`);
+    h+=`<div class="frow2">`;
+    h+=field(L('origin'),`<input class="fi" id="f-origin" value="${esc(d.origin||'')}">`);
+    h+=field(L('abv'),`<input class="fi" id="f-abv" type="number" min="0" max="100" step="0.1" value="${d.abv||''}">`);
+    h+=`</div>`;
+  } else {
+    h+=field(L('zone'),`<select class="fs" id="f-zone" onchange="onZoneChange()"><option value="">${L('selectZone')}</option>${ZONES.slice(1).map(z=>`<option value="${z.id}"${d.zone===z.id?' selected':''}>${clbl(z)}</option>`).join('')}</select>`);
+    const showSrc=d.zone==='external'||d.zone==='mastered';
+    h+=`<div id="src-wrap"${showSrc?'':' style="display:none"'}>`+field(L('source'),`<input class="fi" id="f-src" value="${esc(d.source||'')}" placeholder="${L('phSource')}">`)+`</div>`;
+    h+=field(L('publicLbl'),`<label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="f-public"${d.public?' checked':''}> ${L('publicHint')}</label>`);
+  }
+
+  h+=field(L('description'),`<textarea class="fi fta" id="f-desc" placeholder="${L('phDesc')}">${esc(d.description||'')}</textarea>`);
+
+  if(cat!=='ingredients'&&cat!=='spirits'){
+    h+=field(L('linkIng'), buildAssoc('ing', S.data.ingredients, S.tmp.ing, L('phSearchIng')));
+    h+=field(L('linkSpi'),  buildAssoc('spi', S.data.spirits,      S.tmp.spi, L('phSearchSpi')));
+    h+=field(L('steps'),      buildStepsUI());
+  }
+
+  h+=field(L('notes'),`<textarea class="fi fta" id="f-notes" placeholder="${L('phNotes')}">${esc(d.notes||'')}</textarea>`);
+  h+=field(L('tags'), buildTagsUI());
+  return h;
+}
+
+function onZoneChange(){
+  const z=document.getElementById('f-zone')?.value;
+  const w=document.getElementById('src-wrap');
+  if(w) w.style.display=(z==='external'||z==='mastered')?'':'none';
+}
+
+// ── Association picker (scrollable list with toggle) ──
+function buildAssoc(type, all, sel, ph){
+  const empty=`<div style="padding:.6rem .75rem;font-size:.78rem;color:var(--text-dd)">${L('assocEmpty')}</div>`;
+  const rows=all.map(it=>{
+    const on=sel.includes(it.id)?'on':'';
+    const sub=it.category||it.type||'';
+    return `<div class="assoc-item ${on}" data-id="${it.id}" onclick="toggleAssoc('${type}','${it.id}')">
+      <span>${esc(it.name)}</span>
+      ${sub?`<span class="assoc-sub">${sub}</span>`:''}
+      <span class="assoc-chk">✓</span>
+    </div>`;
+  }).join('');
+  return `<div class="assoc-wrap">
+    <input class="assoc-search" placeholder="${ph}" oninput="filterAssoc('${type}',this.value)">
+    <div class="assoc-list" id="${type}-list">${all.length?rows:empty}</div>
+    <div class="assoc-foot">${lang==="en"?"":"已选 "}<span id="${type}-ct">${sel.length}</span>${lang==="en"?" selected":" 项"}</div>
+  </div>`;
+}
+
+function toggleAssoc(type,id){
+  const sel=type==='ing'?S.tmp.ing:S.tmp.spi;
+  const idx=sel.indexOf(id);
+  if(idx>=0) sel.splice(idx,1); else sel.push(id);
+  const el=document.querySelector(`#${type}-list [data-id="${id}"]`);
+  if(el) el.classList.toggle('on', sel.includes(id));
+  const ct=document.getElementById(`${type}-ct`);
+  if(ct) ct.textContent=sel.length;
+}
+
+function filterAssoc(type,val){
+  const list=document.getElementById(`${type}-list`);
+  if(!list) return;
+  list.querySelectorAll('.assoc-item').forEach(el=>{
+    el.style.display=el.textContent.toLowerCase().includes(val.toLowerCase())?'':'none';
+  });
+}
+
+// ── Steps ──
+function buildStepsUI(){
+  return `<div id="steps-list">${renderStepRows()}</div>
+    <button class="btn btn-ghost btn-sm" style="margin-top:.35rem" onclick="addStep()">${L('addStep')}</button>`;
+}
+
+function renderStepRows(){
+  return S.tmp.steps.map((s,i)=>`
+    <div class="step-row">
+      <span class="step-num">${i+1}</span>
+      <input class="fi" style="flex:1" value="${esc(s)}" oninput="S.tmp.steps[${i}]=this.value">
+      <button class="btn btn-ghost btn-sm" style="padding:.35rem .55rem" onclick="rmStep(${i})">×</button>
+    </div>`).join('');
+}
+
+function addStep(){ S.tmp.steps.push(''); document.getElementById('steps-list').innerHTML=renderStepRows(); }
+function rmStep(i){ S.tmp.steps.splice(i,1); document.getElementById('steps-list').innerHTML=renderStepRows(); }
+
+// ── Tags ──
+function buildTagsUI(){
+  const chips=S.tmp.tags.map(t=>`<span class="chip">${esc(t)}<span class="chip-x" onclick="rmTag('${esc(t)}')">×</span></span>`).join('');
+  return `<div class="chips-box" id="tags-box" onclick="document.getElementById('tags-inp').focus()">
+    ${chips}
+    <input class="tags-inp" id="tags-inp" placeholder="${L('phTags')}" onkeydown="onTagKey(event)">
+  </div>`;
+}
+
+function onTagKey(e){
+  if(e.key==='Enter'||e.key===','){
+    e.preventDefault();
+    const v=e.target.value.trim();
+    if(v&&!S.tmp.tags.includes(v)){
+      S.tmp.tags.push(v);
+      const sp=document.createElement('span'); sp.className='chip';
+      sp.innerHTML=`${esc(v)}<span class="chip-x" onclick="rmTag('${esc(v)}')">×</span>`;
+      document.getElementById('tags-box').insertBefore(sp,e.target);
+    }
+    e.target.value='';
+  }
+}
+
+function rmTag(t){
+  S.tmp.tags=S.tmp.tags.filter(x=>x!==t);
+  const inp=document.getElementById('tags-inp');
+  const box=document.getElementById('tags-box');
+  box.innerHTML=S.tmp.tags.map(tag=>`<span class="chip">${esc(tag)}<span class="chip-x" onclick="rmTag('${esc(tag)}')">×</span></span>`).join('')+inp.outerHTML;
+}
+
+// ── Save item ──
+function saveItem(){
+  const cat=S.editing?S.editing.cat:S.ui.cat;
+  const name=document.getElementById('f-name')?.value.trim();
+  if(!name){ notify(L('enterName'),'err'); return; }
+
+  const item={
+    id:         S.editing ? S.editing.id : uid(),
+    name,
+    description: document.getElementById('f-desc')?.value.trim()||'',
+    notes:       document.getElementById('f-notes')?.value.trim()||'',
+    tags:        [...S.tmp.tags],
+    date_modified: today(),
+  };
+
+  if(cat==='family'){
+    // 关键：家人条目带 raw/照片/提交时间等表单里没有的字段——必须从原件继承，
+    // 否则一编辑就把家人的原话和照片抹掉（saveItem 是整体替换式的）
+    const old=S.editing ? (S.data.family.find(i=>i.id===S.editing.id)||{}) : {};
+    Object.assign(item,{
+      raw:old.raw||'', raw_ingredients:old.raw_ingredients||[], images:old.images||[],
+      submitted_at:old.submitted_at||'', source_id:old.source_id||'', ai_at:old.ai_at||'',
+      copied_to_recipe:old.copied_to_recipe||'', public:!!old.public,
+      contributor:document.getElementById('f-contrib')?.value.trim()||'',
+      relation:document.getElementById('f-rel')?.value.trim()||'',
+      tip:document.getElementById('f-ftip')?.value.trim()||'',
+      story:document.getElementById('f-fstory')?.value.trim()||'',
+      taste:old.taste||'', serves:old.serves||'',
+      ingredients:(document.getElementById('f-fings')?.value||'').split('\n').map(s=>s.trim()).filter(Boolean),
+      steps:(document.getElementById('f-fsteps')?.value||'').split('\n').map(s=>s.trim()).filter(Boolean),
+      organized:true,
+    });
+  } else if(cat==='ingredients'){
+    item.category=document.getElementById('f-cat')?.value||'';
+  } else if(cat==='spirits'){
+    item.type=  document.getElementById('f-type')?.value||'';
+    item.origin=document.getElementById('f-origin')?.value.trim()||'';
+    const abvV=parseFloat(document.getElementById('f-abv')?.value);
+    item.abv=isNaN(abvV)?null:abvV;
+  } else {
+    item.zone=          document.getElementById('f-zone')?.value||'idea';
+    item.source=        document.getElementById('f-src')?.value.trim()||'';
+    item.ingredient_ids=[...S.tmp.ing];
+    item.spirit_ids=    [...S.tmp.spi];
+    item.steps=         S.tmp.steps.filter(s=>s.trim());
+    item.public=        !!document.getElementById('f-public')?.checked;
+  }
+
+  if(!S.editing){
+    item.date_added=today();
+    S.data[cat].push(item);
+  } else {
+    const idx=S.data[cat].findIndex(i=>i.id===S.editing.id);
+    if(idx>=0) S.data[cat][idx]=item;
+  }
+
+  markDirty(); closeModal(); renderAll();
+  notify(lang==="en"?`${S.editing?'Updated':'Added'} “${name}”`:`已${S.editing?'更新':'添加'}「${name}」`,'ok');
+  setTimeout(()=>showDetail(item.id,cat),80);
+}
+
+function delItem(id,cat){
+  const it=S.data[cat].find(i=>i.id===id);
+  if(!it||!confirm(lang==="en"?`Delete “${it.name}”?`:`确认删除「${it.name}」？`)) return;
+  S.data[cat]=S.data[cat].filter(i=>i.id!==id);
+  markDirty(); closeDetail(); renderAll();
+  notify(lang==="en"?`Deleted “${it.name}”`:`已删除「${it.name}」`,'');
+}
+
+// ═══════════════════════════════════════════
+//  NOTIFY
+// ═══════════════════════════════════════════
+let _ntimer;
+function notify(msg,type=''){
+  const el=document.getElementById('notif');
+  el.textContent=msg; el.className=`notif show ${type}`;
+  clearTimeout(_ntimer); _ntimer=setTimeout(()=>el.classList.remove('show'),2600);
+}
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+// Restore config & auto-reconnect on refresh
+applyStatic();
+(async()=>{
+  try {
+    const c=JSON.parse(localStorage.getItem('menu_cfg')||'{}');
+  /* [hub-portal] 从共享配置 pha-config 补全 owner/repo/token（仅填空缺，不覆盖已填，不改 path） */
+  try{var _pha=JSON.parse(localStorage.getItem('pha-config')||'null');if(_pha){if(!c.owner&&_pha.owner)c.owner=_pha.owner;if(!c.repo&&_pha.repo)c.repo=_pha.repo;if(!c.token&&_pha.token)c.token=_pha.token;}}catch(e){}
+    if(c.token) document.getElementById('cfg-tok').value=c.token;
+    if(c.owner) document.getElementById('cfg-own').value=c.owner;
+    if(c.repo)  document.getElementById('cfg-rep').value=c.repo;
+    if(c.branch)document.getElementById('cfg-br').value=c.branch;
+    if(c.path)  document.getElementById('cfg-pa').value=c.path;
+    try{ const ak=localStorage.getItem('menu_apikey'); if(ak) document.getElementById('cfg-ai').value=ak; }catch(e){}
+    if(c.token&&c.owner&&c.repo){
+      S.cfg={ token:c.token, owner:c.owner, repo:c.repo, branch:c.branch||'main', path:c.path||'menu.json' };
+      try { await ghLoad(); } catch(e){ if(e.message.startsWith('404')){ S.data=mkData(); S.sha=null; } else { throw e; } }
+      showApp();
+    }
+  } catch(e){ console.warn('Auto-connect failed:',e); }
+})();
+
+// ═══════════════════════════════════════════
+//  家人菜谱
+//  链路：家人填 /recipe?k=<码> → Cloudflare Function 写私有收件箱仓库
+//        → 这里「收下」→ 落进 menu.json 的 family[] → 照片转存私有数据仓库的 menu-images/
+//  为什么走收件箱而不直接写 menu.json：那个端点的 token 必须限死在一个空仓库里，
+//  不能让家人页面的后端有权碰主数据库。详见 family-recipes-inbox/README.md。
+// ═══════════════════════════════════════════
+const INBOX_REPO = 'family-recipes-inbox';
+const FORM_BASE_DEFAULT = 'https://personal-hub-7uc.pages.dev';
+const AIKEY = 'menu_apikey';
+
+const FAM = { inbox: null, loading: false, err: null };
+
+/** 收件箱 404 时，把「到底哪种令牌」说清楚——私有仓库无权访问时 GitHub 回的是 404 不是 403，
+ *  光看状态码分不出「仓库不存在」和「这把令牌看不见它」。只看令牌前缀，不打印令牌本身。 */
+function famTokenHint() {
+  const t = S.cfg?.token || '';
+  if (t.indexOf('github_pat_') === 0) return L('famHintFine');
+  if (t.indexOf('ghp_') === 0) return L('famHintClassic');
+  return L('famHintUnknown');
+}
+
+function famFormBase() {
+  return (S.data?.meta?.family_form_base || FORM_BASE_DEFAULT).replace(/\/$/, '');
+}
+// 带斜杠：不带的话线上会 308 跳到 /recipe/?k=…（实测查询串不丢，但微信内置浏览器不值得赌）
+function famLink(code) { return `${famFormBase()}/recipe/?k=${encodeURIComponent(code)}`; }
+
+/* ── GitHub 小工具（跨仓库；ghApi 只认 S.cfg 里那个主仓库，所以这里显式带 repo）── */
+function ghUrl(repo, path) { return `https://api.github.com/repos/${S.cfg.owner}/${repo}/contents/${path}`; }
+async function ghGetJson(repo, path) {
+  // cache:'no-store' 是必须的：本 app 也会用 raw Accept 读同一 contents URL 取图片字节，
+  // 浏览器不按 Accept 分桶，缓存会让这里的 .json() 读到图片二进制（已知坑）
+  const f = await ghApi(`${ghUrl(repo, path)}?ref=main&_=${Date.now()}`, { cache: 'no-store' });
+  return { sha: f.sha, data: JSON.parse(decodeURIComponent(escape(atob(f.content.replace(/\n/g, ''))))) };
+}
+async function ghPutJson(repo, path, data, sha, message) {
+  const body = { message, content: btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2)))), branch: 'main' };
+  if (sha) body.sha = sha;
+  return ghApi(ghUrl(repo, path), { method: 'PUT', body: JSON.stringify(body) });
+}
+async function ghPutRaw(repo, path, b64, message) {
+  return ghApi(ghUrl(repo, path), { method: 'PUT', body: JSON.stringify({ message, content: b64, branch: 'main' }) });
+}
+async function ghDel(repo, path, sha, message) {
+  return ghApi(ghUrl(repo, path), { method: 'DELETE', body: JSON.stringify({ message, sha, branch: 'main' }) });
+}
+/** 取文件字节：小文件 Contents API 直接给 base64；>1MB 时 GitHub 不给 content，回退 raw */
+async function ghGetFile(repo, path) {
+  const f = await ghApi(`${ghUrl(repo, path)}?ref=main&_=${Date.now()}`, { cache: 'no-store' });
+  if (f.content) return { b64: f.content.replace(/\n/g, ''), sha: f.sha };
+  const r = await fetch(`${ghUrl(repo, path)}?ref=main&_=${Date.now()}`, {
+    cache: 'no-store',
+    headers: { Authorization: `Bearer ${S.cfg.token}`, Accept: 'application/vnd.github.raw' },
+  });
+  if (!r.ok) throw new Error(`raw ${r.status}`);
+  const buf = new Uint8Array(await r.arrayBuffer());
+  let bin = ''; buf.forEach(b => bin += String.fromCharCode(b));
+  return { b64: btoa(bin), sha: f.sha };
+}
+
+/* ── 私有库里的照片：带令牌取字节 → blob URL（私有仓库不能直接当 img src）── */
+const _famImgCache = {};
+async function famImg(el, repo, path) {
+  const key = repo + '/' + path;
+  if (_famImgCache[key]) { el.src = _famImgCache[key]; return; }
+  try {
+    const { b64 } = await ghGetFile(repo, path);
+    const bin = atob(b64); const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    const url = URL.createObjectURL(new Blob([arr], { type: 'image/jpeg' }));
+    _famImgCache[key] = url; el.src = url;
+  } catch (e) { el.closest('.fam-ph')?.classList.add('fam-ph-bad'); }
+}
+/**
+ * 懒加载：导入 84 道之后，一次性取全部缩略图＝十几 MB 的鉴权请求，页面会卡。
+ * 改成进视口才取（IntersectionObserver），提前 200px 预热；不支持时退回全量取。
+ */
+let _famIO = null;
+function famHydrateImgs(scope) {
+  const list = (scope || document).querySelectorAll('img[data-fam-src]');
+  const load = im => {
+    const [repo, ...rest] = im.dataset.famSrc.split('|');
+    im.removeAttribute('data-fam-src');
+    famImg(im, repo, rest.join('|'));
+  };
+  if (!('IntersectionObserver' in window)) { list.forEach(load); return; }
+  if (!_famIO) {
+    _famIO = new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting) { _famIO.unobserve(e.target); load(e.target); }
+    }), { rootMargin: '200px' });
+  }
+  list.forEach(im => _famIO.observe(im));
+}
+
+/* ── 收件箱 ───────────────────────────────── */
+async function inboxLoad(silent) {
+  if (!S.cfg?.token) { FAM.err = L('famNeedGh'); renderContent(); return; }
+  FAM.loading = true; FAM.err = null; if (!silent) renderContent();
+  try {
+    const { data } = await ghGetJson(INBOX_REPO, 'inbox.json');
+    FAM.inbox = data.submissions || [];
+  } catch (e) {
+    FAM.inbox = null;
+    FAM.err = /404/.test(e.message) ? (L('famNoInboxRepo') + famTokenHint()) : e.message;
+  }
+  FAM.loading = false; renderContent();
+}
+
+async function inboxAccept(subId) {
+  const sub = (FAM.inbox || []).find(s => s.id === subId);
+  if (!sub) return;
+  const btns = document.querySelectorAll('.fam-inbox-act');
+  btns.forEach(b => b.disabled = true);
+  try {
+    // ① 照片转存到主数据库（收件箱以后会被清空，照片必须搬走）
+    const imgs = [];
+    for (const p of (sub.images || [])) {
+      const { b64 } = await ghGetFile(INBOX_REPO, p);
+      const dest = `menu-images/${p.split('/').pop()}`;
+      await ghPutRaw(S.cfg.repo, dest, b64, `photo: 家人菜谱 ${sub.dish || ''}`);
+      imgs.push(dest);
+    }
+    // ② 建条目：家人原话进 raw_* 字段，**永不被 AI 整理覆盖**
+    const item = {
+      id: uid(),
+      name: sub.dish || L('famUnnamed'),
+      contributor: sub.who || '', relation: sub.relation || '',
+      description: '', tags: [],
+      // 页面现在只有一个「备注」框（早期版本分开的火候与故事已合并）；
+      // 旧提交里分开的 tip/story 仍旧兼容——合并进同一个 notes，不丢家人写过的东西
+      notes: sub.note || [sub.tip, sub.story].filter(Boolean).join('\n\n'),
+      raw: sub.text || '', raw_ingredients: sub.ingredients || [],
+      tip: '', story: '', taste: sub.taste || '', serves: sub.serves || '',
+      ingredients: [], steps: [], images: imgs,
+      organized: false, public: false,
+      submitted_at: sub.at || '', source_id: sub.id,
+      date_added: today(), date_modified: today(),
+    };
+    S.data.family.push(item);
+    // ③ 从待收里移除，但**归档进 accepted.json**（照片也留着）——
+    //    家人在自己那条链接里点「我的菜谱」看的就是这份；删掉的话他们那边会凭空少一道菜
+    await inboxArchive(sub);
+    markDirty(); renderAll();
+    notify(lang === 'en' ? `Accepted “${item.name}”` : `已收下「${item.name}」`, 'ok');
+    setTimeout(() => showDetail(item.id, 'family'), 80);
+  } catch (e) {
+    notify((lang === 'en' ? 'Accept failed: ' : '收下失败：') + e.message, 'err');
+  } finally {
+    document.querySelectorAll('.fam-inbox-act').forEach(b => b.disabled = false);
+  }
+}
+
+/** 收下＝从 inbox 移到 accepted（家人可见的自己那份），照片保留 */
+async function inboxArchive(sub) {
+  const acc = await ghGetJson(INBOX_REPO, 'accepted.json').catch(() => null);
+  if (acc) {
+    const list = acc.data.accepted || [];
+    if (!list.some(x => x.id === sub.id)) {
+      acc.data.accepted = [...list, { ...sub, accepted_at: new Date().toISOString() }];
+      await ghPutJson(INBOX_REPO, 'accepted.json', acc.data, acc.sha, `accepted: ${sub.who} 的「${sub.dish || '（未命名）'}」`);
+    }
+  }
+  // 归档过了就只从待收里摘掉，**不删照片**（家人那边还要看）
+  await inboxRemove(sub.id, false);
+}
+
+async function inboxRemove(subId, alsoPhotos) {
+  const { data, sha } = await ghGetJson(INBOX_REPO, 'inbox.json');
+  const sub = (data.submissions || []).find(s => s.id === subId);
+  data.submissions = (data.submissions || []).filter(s => s.id !== subId);
+  await ghPutJson(INBOX_REPO, 'inbox.json', data, sha, `inbox: 处理掉 ${subId}`);
+  if (alsoPhotos && sub) {
+    for (const p of (sub.images || [])) {
+      try {
+        const f = await ghApi(`${ghUrl(INBOX_REPO, p)}?ref=main&_=${Date.now()}`, { cache: 'no-store' });
+        await ghDel(INBOX_REPO, p, f.sha, `photo: 清理 ${p}`);
+      } catch (e) { /* 删不掉就留着，不影响主流程 */ }
+    }
+  }
+  FAM.inbox = (FAM.inbox || []).filter(s => s.id !== subId);
+}
+
+async function inboxDiscard(subId) {
+  const sub = (FAM.inbox || []).find(s => s.id === subId);
+  if (!sub || !confirm(lang === 'en' ? 'Discard this submission?' : `丢掉「${sub.dish || L('famUnnamed')}」这条提交？`)) return;
+  try { await inboxRemove(subId, true); renderContent(); notify(lang === 'en' ? 'Discarded' : '已丢掉', ''); }
+  catch (e) { notify((lang === 'en' ? 'Failed: ' : '失败：') + e.message, 'err'); }
+}
+
+function famInboxBanner() {
+  if (FAM.loading) return `<div class="fam-bar">${L('famLoading')}</div>`;
+  if (FAM.err) return `<div class="fam-bar fam-bar-err">${esc(FAM.err)} <button class="btn btn-ghost btn-sm" onclick="inboxLoad()">${L('famRetry')}</button></div>`;
+  if (FAM.inbox === null) return `<div class="fam-bar"><button class="btn btn-ghost btn-sm" onclick="inboxLoad()">${L('famCheckInbox')}</button></div>`;
+  if (!FAM.inbox.length) return `<div class="fam-bar">${L('famInboxEmpty')} <button class="btn btn-ghost btn-sm" onclick="inboxLoad()">${L('famRefresh')}</button></div>`;
+
+  let h = `<div class="fam-bar fam-bar-new">🆕 ${FAM.inbox.length} ${L('famPending')}
+    <button class="btn btn-ghost btn-sm" onclick="inboxLoad()">${L('famRefresh')}</button></div>`;
+  FAM.inbox.forEach(s => {
+    const ph = (s.images || []).map(p =>
+      `<span class="fam-ph"><img data-fam-src="${INBOX_REPO}|${esc(p)}" alt=""></span>`).join('');
+    const bits = [];
+    if (s.text) bits.push(esc(s.text).slice(0, 260) + (s.text.length > 260 ? '…' : ''));
+    if ((s.ingredients || []).length) bits.push(`<b>${L('famIngs')}</b>：` + s.ingredients.map(esc).join('、'));
+    const note = s.note || [s.tip, s.story].filter(Boolean).join('\n\n');
+    if (note) bits.push(`<b>${L('notes')}</b>：${esc(note)}`);
+    if (s.taste || s.serves) bits.push([s.taste, s.serves].filter(Boolean).map(esc).join(' · '));
+    h += `<div class="fam-sub">
+      <div class="fam-sub-hd"><b>${esc(s.dish || L('famUnnamed'))}</b>
+        <span class="card-zone" style="background:var(--fam)22;color:var(--fam)">${esc(s.who || '?')}</span>
+        <span class="fam-sub-at">${esc((s.at || '').slice(0, 10))}</span></div>
+      ${ph ? `<div class="fam-phs">${ph}</div>` : ''}
+      ${bits.length ? `<div class="fam-sub-body">${bits.join('<br>')}</div>` : ''}
+      <div class="fam-sub-acts">
+        <button class="btn btn-gold btn-sm fam-inbox-act" onclick="inboxAccept('${s.id}')">${L('famAccept')}</button>
+        <button class="btn btn-ghost btn-sm fam-inbox-act" onclick="inboxDiscard('${s.id}')">${L('famDiscard')}</button>
+      </div></div>`;
+  });
+  return h;
+}
+
+/* ── 邀请链接 ─────────────────────────────── */
+/** AI Key 只存本机 localStorage；空值＝清掉（在「设置」里一次性配好，不用弹窗问） */
+function saveAiKey() {
+  const el = document.getElementById('cfg-ai');
+  if (!el) return;
+  const v = el.value.trim();
+  try { v ? localStorage.setItem(AIKEY, v) : localStorage.removeItem(AIKEY); } catch (e) {}
+}
+
+function famNewCode() {
+  const a = new Uint8Array(12); crypto.getRandomValues(a);
+  return [...a].map(b => b.toString(36).padStart(2, '0')).join('').slice(0, 18);
+}
+async function openInvites() {
+  if (!S.cfg?.token) { notify(L('famNeedGh'), 'err'); return; }
+  FAM.editing = null;
+  document.getElementById('modal-ttl').textContent = L('famInvites');
+  document.getElementById('modal-body').innerHTML = `<div class="fam-bar">${L('famLoading')}</div>`;
+  document.getElementById('modal-bg').classList.add('open');
+  try {
+    const { data } = await ghGetJson(INBOX_REPO, 'invites.json');
+    FAM.invites = data.invites || [];
+    renderInvites();
+  } catch (e) {
+    document.getElementById('modal-body').innerHTML =
+      `<div class="fam-bar fam-bar-err">${/404/.test(e.message) ? (L('famNoInboxRepo') + famTokenHint()) : esc(e.message)}</div>`;
+  }
+}
+function renderInvites() {
+  const rows = (FAM.invites || []).map(iv => {
+    // 正在改名字的那一行换成输入框（改名不换 code —— 已经发出去的链接继续有效）
+    if (FAM.editing === iv.code) {
+      return `<div class="fam-iv">
+        <div class="fg"><label class="fl">${L('famWho')}</label>
+          <input class="fi" id="iv-edit-who" value="${esc(iv.who || '')}" placeholder="${L('famWhoPh')}"></div>
+        <div class="fg"><label class="fl">${L('famRel')}</label>
+          <input class="fi" id="iv-edit-rel" value="${esc(iv.relation || '')}" placeholder="${L('famRelPh')}"></div>
+        <div class="fam-iv-acts">
+          <button class="btn btn-gold btn-sm" onclick="famSaveName('${iv.code}')">${L('famSave')}</button>
+          <button class="btn btn-ghost btn-sm" onclick="famCancelEdit()">${L('famCancel')}</button>
+        </div></div>`;
+    }
+    return `<div class="fam-iv${iv.revoked ? ' fam-iv-off' : ''}">
+      <div class="fam-iv-hd"><b>${esc(iv.who || '?')}</b>${iv.relation ? `<span class="fam-iv-rel">${esc(iv.relation)}</span>` : ''}
+        ${iv.revoked ? `<span class="fam-iv-tag">${L('famRevoked')}</span>` : ''}</div>
+      <div class="fam-iv-link" onclick="famCopy('${esc(famLink(iv.code))}')" title="${L('famCopy')}">${esc(famLink(iv.code))}</div>
+      <div class="fam-iv-acts">
+        <button class="btn btn-ghost btn-sm" onclick="famCopy('${esc(famLink(iv.code))}')">${L('famCopy')}</button>
+        <button class="btn btn-ghost btn-sm" onclick="famEditName('${iv.code}')">${L('famEditName')}</button>
+        <button class="btn btn-ghost btn-sm" onclick="famRevoke('${iv.code}')">${iv.revoked ? L('famUnrevoke') : L('famRevoke')}</button>
+        <button class="btn btn-danger btn-sm" onclick="famDelInvite('${iv.code}')">${L('delBtn')}</button>
+      </div></div>`;
+  }).join('');
+  document.getElementById('modal-body').innerHTML = `
+    <div class="fg"><label class="fl">${L('famWho')}</label>
+      <input class="fi" id="iv-who" placeholder="${L('famWhoPh')}"></div>
+    <div class="fg"><label class="fl">${L('famRel')}</label>
+      <input class="fi" id="iv-rel" placeholder="${L('famRelPh')}"></div>
+    <button class="btn btn-gold btn-sm" onclick="famAddInvite()">${L('famMakeLink')}</button>
+    <div class="fam-iv-list">${rows || `<div class="fam-bar">${L('famNoInvites')}</div>`}</div>
+    <div class="fam-note">${L('famInviteNote')}</div>`;
+}
+async function famAddInvite() {
+  const who = document.getElementById('iv-who').value.trim();
+  if (!who) { notify(L('famWhoNeeded'), 'err'); return; }
+  const iv = { code: famNewCode(), who, relation: document.getElementById('iv-rel').value.trim(), created_at: today(), revoked: false };
+  try {
+    const { data, sha } = await ghGetJson(INBOX_REPO, 'invites.json');
+    data.invites = [...(data.invites || []), iv];
+    await ghPutJson(INBOX_REPO, 'invites.json', data, sha, `invite: ${who}`);
+    FAM.invites = data.invites; renderInvites();
+    famCopy(famLink(iv.code));
+    notify(lang === 'en' ? 'Link created & copied' : '链接已生成并复制，发微信给他就行', 'ok');
+  } catch (e) { notify((lang === 'en' ? 'Failed: ' : '失败：') + e.message, 'err'); }
+}
+function famEditName(code) { FAM.editing = code; renderInvites(); }
+function famCancelEdit() { FAM.editing = null; renderInvites(); }
+
+/** 只改称呼与关系，**不动 code** —— 已经发给家人的链接继续有效 */
+async function famSaveName(code) {
+  const who = document.getElementById('iv-edit-who').value.trim();
+  if (!who) { notify(L('famWhoNeeded'), 'err'); return; }
+  const rel = document.getElementById('iv-edit-rel').value.trim();
+  try {
+    const { data, sha } = await ghGetJson(INBOX_REPO, 'invites.json');
+    const iv = (data.invites || []).find(i => i.code === code);
+    if (iv) { iv.who = who; iv.relation = rel; iv.renamed_at = today(); }
+    await ghPutJson(INBOX_REPO, 'invites.json', data, sha, `invite: 改名 ${who}`);
+    FAM.invites = data.invites; FAM.editing = null; renderInvites();
+    notify(lang === 'en' ? 'Renamed' : '已改名（原链接照旧能用）', 'ok');
+  } catch (e) { notify((lang === 'en' ? 'Failed: ' : '失败：') + e.message, 'err'); }
+}
+
+/** 删掉整条邀请。注意与「作废」的区别：作废留痕、删除不留 —— 两者对家人都是链接失效 */
+async function famDelInvite(code) {
+  const iv = (FAM.invites || []).find(i => i.code === code);
+  if (!confirm(lang === 'en' ? `Delete the link for ${iv?.who || code}?`
+    : `删掉「${iv?.who || code}」这条链接？\n\n他手上那个链接会立刻失效（和「作废」效果一样，但这条记录不再保留）。`)) return;
+  try {
+    const { data, sha } = await ghGetJson(INBOX_REPO, 'invites.json');
+    data.invites = (data.invites || []).filter(i => i.code !== code);
+    await ghPutJson(INBOX_REPO, 'invites.json', data, sha, `invite: 删除 ${iv?.who || code}`);
+    FAM.invites = data.invites; FAM.editing = null; renderInvites();
+    notify(lang === 'en' ? 'Deleted' : '已删除', '');
+  } catch (e) { notify((lang === 'en' ? 'Failed: ' : '失败：') + e.message, 'err'); }
+}
+
+async function famRevoke(code) {
+  try {
+    const { data, sha } = await ghGetJson(INBOX_REPO, 'invites.json');
+    const iv = (data.invites || []).find(i => i.code === code);
+    if (iv) iv.revoked = !iv.revoked;
+    await ghPutJson(INBOX_REPO, 'invites.json', data, sha, `invite: ${iv?.revoked ? '作废' : '恢复'} ${iv?.who || code}`);
+    FAM.invites = data.invites; renderInvites();
+  } catch (e) { notify((lang === 'en' ? 'Failed: ' : '失败：') + e.message, 'err'); }
+}
+function famCopy(txt) {
+  navigator.clipboard?.writeText(txt).then(
+    () => notify(lang === 'en' ? 'Copied' : '已复制', 'ok'),
+    () => notify(txt, ''));
+}
+
+/* ── AI 整理：把家人的口述整理成材料 + 步骤，原话永不动 ── */
+async function famOrganize(id) {
+  const it = S.data.family.find(i => i.id === id);
+  if (!it) return;
+  const key = (localStorage.getItem(AIKEY) || '').trim();
+  if (!key) { notify(L('famNoKey'), 'err'); return; }   // 约定：在「设置」里一次性配，不在这里弹窗
+  const btn = document.getElementById('fam-ai-btn');
+  if (btn) { btn.disabled = true; btn.textContent = L('famOrganizing'); }
+  try {
+    const src = [
+      `菜名：${it.name}`,
+      it.raw ? `做法（口述原文）：\n${it.raw}` : '',
+      (it.raw_ingredients || []).length ? `材料（家人写的）：\n${it.raw_ingredients.join('\n')}` : '',
+      it.notes ? `备注（火候/故事等）：${it.notes}` : '',
+      it.tip ? `小秘诀：${it.tip}` : '',
+      it.taste ? `口味：${it.taste}` : '',
+      it.serves ? `份量：${it.serves}` : '',
+    ].filter(Boolean).join('\n');
+    const prompt2 = [
+      '下面是家人口述的一道家常菜。把它整理成可照做的菜谱。规则：',
+      '1. 只用原文里的信息，**不要补充原文没有的用量、时间或步骤**；缺就缺着。',
+      '2. steps 按操作顺序拆成短句，每句一步，不加编号。',
+      '3. ingredients 每项形如「五花肉 一斤」，原文没写量就只写名字。',
+      '4. description 一句话（20 字内）说这是道什么菜。',
+      '5. tips 放火候/易失败点，没有就空数组。',
+      '全部用中文。',
+      '---',
+      src,
+    ].join('\n');
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json', 'x-api-key': key,
+        'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-5', max_tokens: 4000,
+        messages: [{ role: 'user', content: prompt2 }],
+        output_config: { format: { type: 'json_schema', schema: {
+          type: 'object',
+          properties: {
+            description: { type: 'string' },
+            ingredients: { type: 'array', items: { type: 'string' } },
+            steps: { type: 'array', items: { type: 'string' } },
+            tips: { type: 'array', items: { type: 'string' } },
+          },
+          required: ['description', 'ingredients', 'steps', 'tips'],
+          additionalProperties: false } } },
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      // 不删本地 key：它现在是「设置」里一次性配的东西，偷偷抹掉会让人以为设置丢了
+      if (res.status === 401) throw new Error(L('famKeyBad'));
+      throw new Error(err.error?.message || ('HTTP ' + res.status));
+    }
+    const data = await res.json();
+    if (data.stop_reason === 'refusal') throw new Error(L('famRefused'));
+    const out = JSON.parse(data.content?.find(b => b.type === 'text')?.text || '{}');
+    it.description = out.description || it.description;
+    it.ingredients = out.ingredients || [];
+    it.steps = out.steps || [];
+    if ((out.tips || []).length) it.tip = [it.tip, ...out.tips].filter(Boolean).join('\n');
+    it.organized = true; it.ai_at = new Date().toISOString(); it.date_modified = today();
+    markDirty(); renderAll(); showDetail(id, 'family');
+    notify(lang === 'en' ? 'Organized ✓' : 'AI 整理完成 ✓（原话仍在下方保留）', 'ok');
+  } catch (e) {
+    notify((lang === 'en' ? 'AI failed: ' : 'AI 整理失败：') + e.message, 'err');
+    if (btn) { btn.disabled = false; btn.textContent = L('famAi'); }
+  }
+}
+
+/** 把整理好的家人菜谱复制一条到「食谱」区（家人原件保留在家人菜谱里） */
+function famToRecipe(id) {
+  const it = S.data.family.find(i => i.id === id);
+  if (!it) return;
+  const r = {
+    id: uid(), name: it.name,
+    description: it.description || '',
+    notes: [it.raw ? `${L('famRaw')}（${it.contributor}）：\n${it.raw}` : '', it.tip, it.story].filter(Boolean).join('\n\n'),
+    tags: [...(it.tags || []), it.contributor].filter(Boolean),
+    zone: 'external', source: it.contributor ? `${it.contributor}${it.relation ? '（' + it.relation + '）' : ''}` : '',
+    ingredient_ids: [], spirit_ids: [],
+    steps: (it.steps || []).length ? [...it.steps] : (it.raw ? it.raw.split('\n').filter(Boolean) : []),
+    public: false, date_added: today(), date_modified: today(),
+  };
+  S.data.recipes.push(r);
+  it.copied_to_recipe = r.id;
+  markDirty(); renderAll();
+  notify(lang === 'en' ? 'Copied into Recipes' : '已复制一份到「食谱」区', 'ok');
+}
+
+/* ── 家人菜谱的卡片与详情 ─────────────────── */
+function famCard(item) {
+  const ph = (item.images || [])[0];
+  const feet = [];
+  if ((item.ingredients || []).length) feet.push(`🥬 ${item.ingredients.length}`);
+  if ((item.steps || []).length) feet.push(`📋 ${item.steps.length}${lang === 'en' ? ' steps' : ' 步'}`);
+  if ((item.images || []).length) feet.push(`📷 ${item.images.length}`);
+  return `<div class="card" onclick="showDetail('${item.id}','family')">
+    <div class="card-bar" style="background:var(--fam)"></div>
+    <span class="card-zone" style="background:var(--fam)22;color:var(--fam)">${esc(item.contributor || '?')}</span>
+    ${!item.organized ? `<span class="fam-new">${L('famRawTag')}</span>` : ''}
+    <div class="card-name">${esc(item.name)}</div>
+    ${ph ? `<div class="fam-ph fam-ph-card"><img data-fam-src="${S.cfg?.repo || ''}|${esc(ph)}" alt=""></div>` : ''}
+    ${item.description ? `<div class="card-desc">${esc(item.description)}</div>` : (item.raw ? `<div class="card-desc">${esc(item.raw.slice(0, 60))}…</div>` : '')}
+    ${feet.length ? `<div class="card-foot">${feet.join(' · ')}</div>` : ''}
+  </div>`;
+}
+
+function famDetail(item) {
+  let h = `<span class="card-zone" style="background:var(--fam)22;color:var(--fam)">${esc(item.contributor || '?')}${item.relation ? ' · ' + esc(item.relation) : ''}</span>`;
+  if (!item.organized) h += `<span class="fam-new">${L('famRawTag')}</span>`;
+  h += `<div class="d-name">${esc(item.name)}</div>`;
+  if (item.submitted_at) h += `<div class="d-src">${L('famSubmitted')}：${esc(item.submitted_at.slice(0, 10))}</div>`;
+  if (item.description) h += `<div class="d-sec"><div class="d-sec-lbl">${L('summary')}</div><div class="d-text">${esc(item.description)}</div></div>`;
+  if ((item.images || []).length) {
+    h += `<div class="d-sec"><div class="d-sec-lbl">${L('famPhotos')}</div><div class="fam-phs">` +
+      item.images.map(p => `<span class="fam-ph fam-ph-big"><img data-fam-src="${S.cfg?.repo || ''}|${esc(p)}" alt=""></span>`).join('') +
+      `</div></div>`;
+  }
+  if ((item.ingredients || []).length) {
+    h += `<div class="d-sec"><div class="d-sec-lbl">${L('ingredients')}</div><div class="card-tags">` +
+      item.ingredients.map(x => `<span class="card-tag">${esc(x)}</span>`).join('') + `</div></div>`;
+  }
+  if ((item.steps || []).length) {
+    h += `<div class="d-sec"><div class="d-sec-lbl">${L('steps')}</div><ol class="steps-ol">` +
+      item.steps.map(s => `<li>${esc(s)}</li>`).join('') + `</ol></div>`;
+  }
+  if (item.tip) h += `<div class="d-sec"><div class="d-sec-lbl">${L('famTip')}</div><div class="d-text">${esc(item.tip)}</div></div>`;
+  if (item.story) h += `<div class="d-sec"><div class="d-sec-lbl">${L('famStory')}</div><div class="d-text">${esc(item.story)}</div></div>`;
+  if (item.taste || item.serves) h += `<div class="d-sec"><div class="d-sec-lbl">${L('famTaste')}</div><div class="d-text">${esc([item.taste, item.serves].filter(Boolean).join(' · '))}</div></div>`;
+  // 原话永远留在最后一段，AI 整理不会动它
+  if (item.raw || (item.raw_ingredients || []).length) {
+    h += `<div class="d-sec fam-raw"><div class="d-sec-lbl">${L('famRaw')}</div>` +
+      (item.raw ? `<div class="d-text">${esc(item.raw)}</div>` : '') +
+      ((item.raw_ingredients || []).length ? `<div class="d-text">${esc(item.raw_ingredients.join('、'))}</div>` : '') +
+      `</div>`;
+  }
+  if (item.notes) h += `<div class="d-sec"><div class="d-sec-lbl">${L('notes')}</div><div class="d-text">${esc(item.notes)}</div></div>`;
+  h += `<div class="d-acts">
+    <button class="btn btn-gold btn-sm" id="fam-ai-btn" onclick="famOrganize('${item.id}')">${item.organized ? L('famAiAgain') : L('famAi')}</button>
+    <button class="btn btn-ghost btn-sm" onclick="famToRecipe('${item.id}')">${item.copied_to_recipe ? L('famToRecipeAgain') : L('famToRecipe')}</button>
+    <button class="btn btn-ghost btn-sm" onclick="openEdit('${item.id}','family')">${L('editBtn')}</button>
+    <button class="btn btn-danger btn-sm" onclick="delItem('${item.id}','family')">${L('delBtn')}</button>
+  </div>`;
+  return h;
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){ closeModal(); closeDetail(); }
+  if((e.metaKey||e.ctrlKey)&&e.key==='s'){ e.preventDefault(); ghSave(); }
+});
+</script>
+</body>
+</html>
