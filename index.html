@@ -835,7 +835,12 @@ function updSaveStatus(){
 let _syncTimer;
 function markDirty(){
   S.dirty=true;
-  if(S.cfg?.offline) localStorage.setItem('menu_data_offline',JSON.stringify(S.data));
+  // 离线缓存只是兜底：写不下就跳过，**绝不能让它打断正在进行的编辑**
+  if(S.cfg?.offline){
+    try{ localStorage.setItem('menu_data_offline',JSON.stringify(S.data)); }
+    catch(e){ try{ localStorage.removeItem('menu_data_offline'); }catch(e2){}
+      console.warn('离线缓存写不下，已跳过（不影响使用，数据在仓库里）:', e.message); }
+  }
   if(S.cfg?.token){
     clearTimeout(_syncTimer);
     const st=document.getElementById('save-st');
