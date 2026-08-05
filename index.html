@@ -457,7 +457,7 @@ button,a,summary,label,[role="button"],[onclick]{
   <div class="modal">
     <div class="modal-hdr">
       <div class="modal-title" id="modal-ttl">添加</div>
-      <button class="modal-x" onclick="closeModal()">✕</button>
+      <button aria-label="关闭" class="modal-x" onclick="closeModal()">✕</button>
     </div>
     <div id="modal-body"></div>
     <div class="modal-ftr">
@@ -469,7 +469,7 @@ button,a,summary,label,[role="button"],[onclick]{
 
 <!-- ══════════════ DETAIL PANEL ══════════════ -->
 <div class="detail" id="detail">
-  <button class="detail-x" onclick="closeDetail()">✕</button>
+  <button aria-label="关闭" class="detail-x" onclick="closeDetail()">✕</button>
   <div id="detail-body"></div>
 </div>
 
@@ -1176,7 +1176,7 @@ function renderStepRows(){
     <div class="step-row">
       <span class="step-num">${i+1}</span>
       <input class="fi" style="flex:1" value="${esc(s)}" oninput="S.tmp.steps[${i}]=this.value">
-      <button class="btn btn-ghost btn-sm" style="padding:.35rem .55rem" onclick="rmStep(${i})">×</button>
+      <button aria-label="删除这一步" class="btn btn-ghost btn-sm" style="padding:.35rem .55rem" onclick="rmStep(${i})">×</button>
     </div>`).join('');
 }
 
